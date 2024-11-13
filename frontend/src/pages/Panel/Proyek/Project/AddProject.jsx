@@ -27,19 +27,8 @@ import { Progress } from "@/components/ui/progress"
 import { ScrollArea } from '@/components/ui/scroll-area';
 
 
-const indonesiaData = {
-    "Provinsi A": {
-        "Kabupaten A1": ["Kecamatan A1-1", "Kecamatan A1-2"],
-        "Kabupaten A2": ["Kecamatan A2-1", "Kecamatan A2-2"]
-    },
-    "Provinsi B": {
-        "Kabupaten B1": ["Kecamatan B1-1", "Kecamatan B1-2"],
-        "Kabupaten B2": ["Kecamatan B2-1", "Kecamatan B2-2"]
-    }
-};
 
-
-const AddProject = ({className}) => {
+const AddProject = ({ className }) => {
     const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
     const [isFolderVisible, setIsFolderVisible] = useState(false);
 
@@ -54,25 +43,72 @@ const AddProject = ({className}) => {
         };
     }, []);
 
+    const [provinces, setProvinces] = useState([]);
+    const [selectedProvince, setSelectedProvince] = useState('');
+    const [regencies, setRegencies] = useState([]);
+    const [selectedRegency, setSelectedRegency] = useState('');
+    const [subDistricts, setSubDistricts] = useState([]);
+    const [selectedDistricts, setSelectedDistricts] = useState('');
+    const [subvillages, setsubvillages] = useState([]);
+
+    // Fetch provinces when the component mounts
+    useEffect(() => {
+        fetch(`https://www.emsifa.com/api-wilayah-indonesia/api/provinces.json`)
+            .then(response => response.json())
+            .then(provinces => setProvinces(provinces));
+    }, []);
+
+    // Fetch regencies when a province is selected
+    useEffect(() => {
+        if (selectedProvince) {
+            fetch(`https://www.emsifa.com/api-wilayah-indonesia/api/regencies/${selectedProvince}.json`)
+                .then(response => response.json())
+                .then(regencies => setRegencies(regencies));
+        }
+    }, [selectedProvince]);
+
+    // Fetch sub-districts when a regency is selected
+    useEffect(() => {
+        if (selectedRegency) {
+            fetch(`https://www.emsifa.com/api-wilayah-indonesia/api/districts/${selectedRegency}.json`)
+                .then(response => response.json())
+                .then(districts => setSubDistricts(districts));
+
+        }
+    }, [selectedRegency]);
+
+    // Fetch sub-districts when a regency is selected
+    useEffect(() => {
+        if (selectedDistricts) {
+            fetch(`https://www.emsifa.com/api-wilayah-indonesia/api/villages/${selectedDistricts}.json`)
+                .then(response => response.json())
+                .then(data => setsubvillages(data));
+        }
+    }, [selectedDistricts]);
+
+    const handleProvinceChange = (value) => {
+        setSelectedProvince(value);
+        setRegencies([]); // Reset regencies when a new province is selected
+        setSelectedRegency('');
+        setSubDistricts([]); // Reset sub-districts
+        setSelectedDistricts('');
+        setsubvillages([]);
+        //   alert(selectedProvince)
+    };
+
+    const handleRegencyChange = (value) => {
+        setSelectedRegency(value);
+        setSubDistricts([]); // Reset sub-districts when a new regency is selected
+    };
+
+    const handleDistrictsChange = (value) => {
+        setSelectedDistricts(value);
+        setsubvillages([]); // Reset sub-districts when a new regency is selected
+
+    };
+
     const [currentStep, setCurrentStep] = useState(0);
     const [ContentStep, setContentStep] = useState(0);
-    const [selectedProvince, setSelectedProvince] = React.useState("");
-    const [selectedRegency, setSelectedRegency] = React.useState("");
-    const [regencies, setRegencies] = React.useState([]);
-    const [subDistricts, setSubDistricts] = React.useState([]);
-
-    const handleProvinceChange = (province) => {
-        setSelectedProvince(province);
-        setRegencies(Object.keys(indonesiaData[province] || {}));
-        setSelectedRegency("");
-        setSubDistricts([]);
-    };
-
-    const handleRegencyChange = (regency) => {
-        setSelectedRegency(regency);
-        setSubDistricts(indonesiaData[selectedProvince][regency] || []);
-    };
-
     const [progress, setProgress] = useState(50);
     return (
         <Dialog>
@@ -279,9 +315,9 @@ const AddProject = ({className}) => {
                                                 <SelectContent>
                                                     <SelectGroup>
                                                         <SelectLabel>Provinsi</SelectLabel>
-                                                        {Object.keys(indonesiaData).map((province) => (
-                                                            <SelectItem key={province} value={province}>
-                                                                {province}
+                                                        {provinces.map((province) => (
+                                                            <SelectItem key={province.id} value={province.id}>
+                                                                {province.name}
                                                             </SelectItem>
                                                         ))}
                                                     </SelectGroup>
@@ -304,8 +340,8 @@ const AddProject = ({className}) => {
                                                     <SelectGroup>
                                                         <SelectLabel>Kabupaten / Kota</SelectLabel>
                                                         {regencies.map((regency) => (
-                                                            <SelectItem key={regency} value={regency}>
-                                                                {regency}
+                                                            <SelectItem key={regency.id} value={regency.id}>
+                                                                {regency.name}
                                                             </SelectItem>
                                                         ))}
                                                     </SelectGroup>
@@ -316,20 +352,44 @@ const AddProject = ({className}) => {
                                     <div className='flex flex-wrap -m-4 pt-[16px] pb-[32px]'>
                                         <div className='lg:w-[32%] md:w-1/2 w-full px-4'>
                                             <div className='w-full text-[14px] font-semibold grid gap-[8px] pb-[8px]'>
-                                                <h4>Kecamatan / Desa</h4>
+                                                <h4>Kecamatan</h4>
                                             </div>
                                         </div>
                                         <div className='lg:w-[68%] md:w-1/2 w-full px-4'>
-                                            <Select disabled={!selectedRegency}>
+                                            <Select onValueChange={handleDistrictsChange} disabled={!selectedRegency}>
                                                 <SelectTrigger className="w-full h-[36px] text-[14px]">
                                                     <SelectValue placeholder="Pilih Salah Satu" />
                                                 </SelectTrigger>
                                                 <SelectContent>
                                                     <SelectGroup>
-                                                        <SelectLabel>Kecamatan / Desa</SelectLabel>
+                                                        <SelectLabel>Kecamatan</SelectLabel>
                                                         {subDistricts.map((subDistrict) => (
-                                                            <SelectItem key={subDistrict} value={subDistrict}>
-                                                                {subDistrict}
+                                                            <SelectItem key={subDistrict.id} value={subDistrict.id}>
+                                                                {subDistrict.name}
+                                                            </SelectItem>
+                                                        ))}
+                                                    </SelectGroup>
+                                                </SelectContent>
+                                            </Select>
+                                        </div>
+                                    </div>
+                                    <div className='flex flex-wrap -m-4 pt-[16px] pb-[32px]'>
+                                        <div className='lg:w-[32%] md:w-1/2 w-full px-4'>
+                                            <div className='w-full text-[14px] font-semibold grid gap-[8px] pb-[8px]'>
+                                                <h4>Kelurahan/Desa</h4>
+                                            </div>
+                                        </div>
+                                        <div className='lg:w-[68%] md:w-1/2 w-full px-4'>
+                                            <Select disabled={!selectedDistricts}>
+                                                <SelectTrigger className="w-full h-[36px] text-[14px]">
+                                                    <SelectValue placeholder="Pilih Salah Satu" />
+                                                </SelectTrigger>
+                                                <SelectContent>
+                                                    <SelectGroup>
+                                                        <SelectLabel>Kelurahan/Desa</SelectLabel>
+                                                        {subvillages.map((subDistrict) => (
+                                                            <SelectItem key={subDistrict.id} value={subDistrict.id}>
+                                                                {subDistrict.name}
                                                             </SelectItem>
                                                         ))}
                                                     </SelectGroup>

@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useRef, useEffect } from 'react'
 import { Input } from '@/components/ui/input'
 import { SearchNormal1 } from 'iconsax-react';
 import { Button } from "@/components/ui/button"
@@ -22,6 +22,18 @@ import AddUser from './AddUser';
 
 
 const TableData = () => {
+    const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+
+    useEffect(() => {
+        const handleResize = () => {
+            setIsMobile(window.innerWidth < 768);
+        };
+
+        window.addEventListener("resize", handleResize);
+        return () => {
+            window.removeEventListener("resize", handleResize);
+        };
+    }, []);
     const DataRole = [
         { id: "1", name: 'Admin' },
         { id: "2", name: 'Manager' },
@@ -157,7 +169,7 @@ const TableData = () => {
 
     return (
         <div>
-            <div className=' flex gap-[12px] py-[12px]'>
+            <div className={` flex gap-[12px] py-[12px] ${isMobile && ('px-[24px]')}`}>
                 <div className="relative w-[340px] h-[32px]">
                     <SearchNormal1 className="absolute left-[16px] top-1/2 transform -translate-y-1/2 " size={16} />
                     <Input
@@ -335,7 +347,7 @@ const TableData = () => {
                                 <p className='text-[14px] text-[#717179]'>Tidak ada data pengguna dihalaman ini</p>
                             </div>
 
-                            <AddUser className='w-[286px]' />
+                            <AddUser className='w-[286px]' textButton='Tambahkan Pengguna'/>
                         </div>
                     )}
                 </div>
