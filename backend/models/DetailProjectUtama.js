@@ -2,14 +2,14 @@ const { Model, DataTypes } = require('sequelize');
 const sequelize = require('../config/database');
 
 class DetailProjectUtama extends Model {
-    toJSON() {
-        return {
-          ...this.get(),
-          createdAt: this.createdAt ? this.createdAt.toISOString() : null,
-          updatedAt: this.updatedAt ? this.updatedAt.toISOString() : null,
-          deletedAt: this.deletedAt ? this.deletedAt.toISOString() : null,
-        };
-      }
+    // toJSON() {
+    //     return {
+    //       ...this.get(),
+    //       createdAt: this.createdAt ? this.createdAt.toISOString() : null,
+    //       updatedAt: this.updatedAt ? this.updatedAt.toISOString() : null,
+    //       deletedAt: this.deletedAt ? this.deletedAt.toISOString() : null,
+    //     };
+    //   }
 }
 
 DetailProjectUtama.init({
@@ -22,7 +22,7 @@ DetailProjectUtama.init({
         type: DataTypes.INTEGER,
         allowNull: false,
         references: {
-            model: 'project',
+            model: 'projects',
             key: 'id_project',
         },
     },
@@ -55,7 +55,7 @@ DetailProjectUtama.init({
 }, {
     sequelize,
     modelName: 'DetailProjectUtama',
-    tableName: 'detail_project_utama',
+    tableName: 'detailprojectutamas',
     timestamps: true,
     paranoid: true,
 });

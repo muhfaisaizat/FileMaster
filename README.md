@@ -19,10 +19,10 @@ Pastikan sudah menginstal:
 
 1. Buka terminal dan pindah ke direktori backend: `cd backend`
 2. Instal dependensi: `npm install` atau, jika menggunakan yarn: `yarn install`
-3. Buat database pada mysql dengan nama 
-4. Migrate database sirqu `npx sequelize-cli db:migrate` dan lakukan seeder user `npx sequelize db:seed:all`
+3. Buat database pada mysql dengan nama `filemaster_db`
+4. Migrate database filemaster `npx sequelize-cli db:migrate` dan lakukan seeder `npx sequelize db:seed:all`
 5. Jalankan server backend: `nodemon app` atau `node app`
-6. Buka tab browser kemudian buka url berikut 
+6. Buka tab browser kemudian buka url berikut `http://localhost:5000/api-filemaster/docs`
    
 ### 2. Menyiapkan Frontend
 

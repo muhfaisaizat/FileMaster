@@ -2,7 +2,7 @@
 
 module.exports = {
   up: async (queryInterface, Sequelize) => {
-    await queryInterface.createTable('Project', {
+    await queryInterface.createTable('projects', {
       id_project: {
         type: Sequelize.INTEGER,
         autoIncrement: true,
@@ -29,7 +29,7 @@ module.exports = {
         type: Sequelize.STRING,
         allowNull: true,
       },
-      instansi: {
+      instansi_organisasi: {
         type: Sequelize.STRING,
         allowNull: true,
       },
@@ -37,7 +37,7 @@ module.exports = {
         type: Sequelize.STRING,
         allowNull: true,
       },
-      alamat: {
+      alamat_lengkap: {
         type: Sequelize.STRING,
         allowNull: true,
       },
@@ -45,11 +45,15 @@ module.exports = {
         type: Sequelize.STRING,
         allowNull: true,
       },
-      kabupaten: {
+      kabupaten_kota: {
         type: Sequelize.STRING,
         allowNull: true,
       },
-      kecamatan_desa: {
+      kecamatan: {
+        type: Sequelize.STRING,
+        allowNull: true,
+      },
+      kelurahan_desa: {
         type: Sequelize.STRING,
         allowNull: true,
       },
@@ -71,6 +75,6 @@ module.exports = {
   },
 
   down: async (queryInterface, Sequelize) => {
-    await queryInterface.dropTable('Project');
+    await queryInterface.dropTable('projects');
   }
 };

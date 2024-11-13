@@ -17,26 +17,40 @@ const ProjectController = require('../controllers/ProjectController');
  *             properties:
  *               nama_project:
  *                 type: string
+ *                 example: Persiapan Bangun PT Indomaret
  *               kategori:
  *                 type: string
+ *                 example: Persiapan Bangun
  *               deskripsi:
  *                 type: string
+ *                 example: Penjelasan deskripsi proyek singkat
  *               nama_pengaju_project:
  *                 type: string
+ *                 example: Nurmaningtiyas
  *               jabatan:
  *                 type: string
- *               instansi:
+ *                 example: Manager
+ *               instansi_organisasi:
  *                 type: string
+ *                 example: PT Indomaret
  *               no_telp:
  *                 type: string
- *               alamat:
+ *                 example: 89230493210
+ *               alamat_lengkap:
  *                 type: string
+ *                 example: Jl langka, dusun baru Keramik merah
  *               provinsi:
  *                 type: string
- *               kabupaten:
+ *                 example: Jawa Timur
+ *               kabupaten_kota:
  *                 type: string
- *               kecamatan_desa:
+ *                 example: Tulungagung
+ *               kecamatan:
  *                 type: string
+ *                 example: Tulungagung
+ *               kelurahan_desa:
+ *                 type: string
+ *                 example: Pakel
  *     responses:
  *       201:
  *         description: Project created successfully
@@ -112,17 +126,19 @@ router.get('/:id', ProjectController.getProjectById);
  *                 type: string
  *               jabatan:
  *                 type: string
- *               instansi:
+ *               instansi_organisasi:
  *                 type: string
  *               no_telp:
  *                 type: string
- *               alamat:
+ *               alamat_lengkap:
  *                 type: string
  *               provinsi:
  *                 type: string
- *               kabupaten:
+ *               kabupaten_kota:
  *                 type: string
- *               kecamatan_desa:
+ *               kecamatan:
+ *                 type: string
+ *               kelurahan_desa:
  *                 type: string
  *     responses:
  *       200:
