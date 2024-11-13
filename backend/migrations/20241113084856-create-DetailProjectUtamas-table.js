@@ -2,8 +2,8 @@
 
 module.exports = {
   up: async (queryInterface, Sequelize) => {
-    await queryInterface.createTable('detail_project_pendukung', {
-      id_project_pendukung: {
+    await queryInterface.createTable('DetailProjectUtamas', {
+      id_project_utama: {
         type: Sequelize.INTEGER,
         autoIncrement: true,
         primaryKey: true,
@@ -13,7 +13,7 @@ module.exports = {
         type: Sequelize.INTEGER,
         allowNull: false,
         references: {
-          model: 'project', // Nama tabel yang direferensikan
+          model: 'projects', // Nama tabel yang direferensikan
           key: 'id_project',
         },
         onUpdate: 'CASCADE',
@@ -50,12 +50,12 @@ module.exports = {
   },
 
   references: {
-    model: 'project', // Nama tabel yang direferensikan
+    model: 'projects', // Nama tabel yang direferensikan
     key: 'id_project',
   },
   
 
   down: async (queryInterface, Sequelize) => {
-    await queryInterface.dropTable('detail_project_pendukung');
+    await queryInterface.dropTable('DetailProjectUtamas');
   }
 };

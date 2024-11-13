@@ -29,7 +29,7 @@ Project.init({
         type: DataTypes.STRING,
         allowNull: false,
     },
-    instansi: {
+    instansi_organisasi: {
         type: DataTypes.STRING,
         allowNull: false,
     },
@@ -37,7 +37,7 @@ Project.init({
         type: DataTypes.STRING,
         allowNull: false,
     },
-    alamat: {
+    alamat_lengkap: {
         type: DataTypes.STRING,
         allowNull: false,
     },
@@ -45,11 +45,15 @@ Project.init({
         type: DataTypes.STRING,
         allowNull: false,
     },
-    kabupaten: {
+    kabupaten_kota: {
         type: DataTypes.STRING,
         allowNull: false,
     },
-    kecamatan_desa: {
+    kecamatan: {
+        type: DataTypes.STRING,
+        allowNull: false,
+    },
+    kelurahan_desa: {
         type: DataTypes.STRING,
         allowNull: false,
     },
@@ -69,7 +73,7 @@ Project.init({
 }, {
     sequelize,
     modelName: 'Project',
-    tableName: 'project',
+    tableName: 'projects',
     timestamps: true,
     paranoid: true,
 });

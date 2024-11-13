@@ -22,7 +22,7 @@ DetailProjectPendukung.init({
         type: DataTypes.INTEGER,
         allowNull: false,
         references: {
-            model: 'project',
+            model: 'projects',
             key: 'id_project',
         },
     },
@@ -55,7 +55,7 @@ DetailProjectPendukung.init({
 }, {
     sequelize,
     modelName: 'DetailProjectPendukung',
-    tableName: 'detail_project_pendukung',
+    tableName: 'detailprojectpendukungs',
     timestamps: true,
     paranoid: true,
 });
