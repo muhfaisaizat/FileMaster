@@ -42,20 +42,25 @@ Project.init({
         allowNull: false,
     },
     provinsi: {
-        type: DataTypes.STRING,
+        type: DataTypes.INTEGER,
         allowNull: false,
     },
     kabupaten_kota: {
-        type: DataTypes.STRING,
+        type: DataTypes.INTEGER,
         allowNull: false,
     },
     kecamatan: {
-        type: DataTypes.STRING,
+        type: DataTypes.INTEGER,
         allowNull: false,
     },
     kelurahan_desa: {
-        type: DataTypes.STRING,
+        type: DataTypes.INTEGER,
         allowNull: false,
+    },
+    archive: {
+        type: DataTypes.ENUM('Aktif', 'Arsip'),
+        allowNull: false,
+        defaultValue: 'Aktif'
     },
     createdAt: {
         type: DataTypes.DATE,

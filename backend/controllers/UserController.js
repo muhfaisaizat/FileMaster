@@ -1,6 +1,7 @@
 const User = require('../models/User');
 const argon2 = require('argon2');
 const path = require('path');
+const fs = require('fs');
 
 exports.createUser = async (req, res) => {
     const { name, email, password, role, status } = req.body;
@@ -56,17 +57,31 @@ exports.updateUser = async (req, res) => {
   const user = await User.findByPk(req.params.id);
   if (!user) return res.status(404).json({ error: 'User not found' });
 
-  // Jika gambar baru diupload, ganti path gambar
-  const imagePath = req.file ? `PP_${req.body.name}_${req.file.originalname}` : user.image;
+  // If a new image is uploaded, delete the old image from the images folder
+  if (req.file) {
+    // Construct path of the old image file
+    const oldImagePath = path.join(__dirname, '../images', user.image);
+    
+    // Check if the old image exists and remove it
+    fs.unlink(oldImagePath, (err) => {
+      if (err) {
+        console.error('Error deleting old image:', err);
+      }
+    });
+    
+    // Generate the new image path
+    const imagePath = `PP_${req.body.name}_${req.file.originalname}`;
+    user.image = imagePath; // Update image path with the new image
+  }
 
-  // Perbarui informasi user
+  // Update user details
   user.name = name || user.name;
   user.role = role || user.role;
   user.status = status || user.status;
-  user.image = imagePath; // Update image path if a new image is uploaded
+
   await user.save();
 
-  res.json({ message: 'User updated', user });
+  res.json({ message: 'User updated successfully', user });
 };
 
 exports.deleteUser = async (req, res) => {

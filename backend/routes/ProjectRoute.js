@@ -40,17 +40,17 @@ const ProjectController = require('../controllers/ProjectController');
  *                 type: string
  *                 example: Jl langka, dusun baru Keramik merah
  *               provinsi:
- *                 type: string
- *                 example: Jawa Timur
+ *                 type: integer
+ *                 example: 001
  *               kabupaten_kota:
- *                 type: string
- *                 example: Tulungagung
+ *                 type: integer
+ *                 example: 001
  *               kecamatan:
- *                 type: string
- *                 example: Tulungagung
+ *                 type: integer
+ *                 example: 001
  *               kelurahan_desa:
- *                 type: string
- *                 example: Pakel
+ *                 type: integer
+ *                 example: 001
  *     responses:
  *       201:
  *         description: Project created successfully
@@ -133,13 +133,17 @@ router.get('/:id', ProjectController.getProjectById);
  *               alamat_lengkap:
  *                 type: string
  *               provinsi:
- *                 type: string
+ *                 type: integer
+ *                 example: 001
  *               kabupaten_kota:
- *                 type: string
+ *                 type: integer
+ *                 example: 001
  *               kecamatan:
- *                 type: string
+ *                 type: integer
+ *                 example: 001
  *               kelurahan_desa:
- *                 type: string
+ *                 type: integer
+ *                 example: 001
  *     responses:
  *       200:
  *         description: Project updated successfully
@@ -172,5 +176,57 @@ router.put('/:id', ProjectController.updateProject);
  *         description: Error deleting project
  */
 router.delete('/:id', ProjectController.deleteProject);
+
+/**
+ * @swagger
+ * /api/projects/{id}/archive:
+ *   put:
+ *     summary: Update project archive by ID
+ *     tags: [Projects]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: ID of the project to update
+ *       - in: query
+ *         name: archive
+ *         required: true
+ *         schema:
+ *           type: string
+ *           enum: [Aktif, Arsip]
+ *         description: New archive status for the project
+ *     responses:
+ *       200:
+ *         description: Project archive updated successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                 message:
+ *                   type: string
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     id_project:
+ *                       type: integer
+ *                     nama_project:
+ *                       type: string
+ *                     kategori:
+ *                       type: string
+ *                     archive:
+ *                       type: string
+ *       400:
+ *         description: Invalid archive value
+ *       404:
+ *         description: Project not found
+ *       500:
+ *         description: Internal server error
+ */
+router.put('/:id/archive', ProjectController.updateProjectArchive);
 
 module.exports = router;

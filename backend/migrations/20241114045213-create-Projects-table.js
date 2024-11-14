@@ -42,20 +42,25 @@ module.exports = {
         allowNull: true,
       },
       provinsi: {
-        type: Sequelize.STRING,
+        type: Sequelize.INTEGER,
         allowNull: true,
       },
       kabupaten_kota: {
-        type: Sequelize.STRING,
+        type: Sequelize.INTEGER,
         allowNull: true,
       },
       kecamatan: {
-        type: Sequelize.STRING,
+        type: Sequelize.INTEGER,
         allowNull: true,
       },
       kelurahan_desa: {
-        type: Sequelize.STRING,
+        type: Sequelize.INTEGER,
         allowNull: true,
+      },
+      archive: {
+        type: Sequelize.ENUM('Aktif', 'Arsip'),
+        allowNull: false,
+        defaultValue: 'Aktif'
       },
       createdAt: {
         type: Sequelize.DATE,
