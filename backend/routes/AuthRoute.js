@@ -3,9 +3,43 @@ const {
   login,
   forgotPassword,
   resetPassword,
-  lupaPassword
+  lupaPassword,
+  checkEmailExists
 } = require("../controllers/AuthController.js");
 const router = express.Router();
+
+
+/**
+ * @swagger
+ * /api/auth/check-email/{email}:
+ *   get:
+ *     summary: Check if an email exists in the database
+ *     tags: [Auth]
+ *     parameters:
+ *       - in: path
+ *         name: email
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: Email to check for existence
+ *     responses:
+ *       200:
+ *         description: Email existence check result
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 exists:
+ *                   type: boolean
+ *                 message:
+ *                   type: string
+ *       400:
+ *         description: Missing email in the request
+ *       500:
+ *         description: Internal server error
+ */
+router.get("/check-email/:email", checkEmailExists);
 
 /**
  * @swagger
