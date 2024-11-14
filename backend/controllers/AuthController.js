@@ -20,7 +20,6 @@ function getAdjustedDate() {
 
 const JWT_SECRET = process.env.JWT_SECRET;
 
-
 // Fungsi login
 exports.login = async (req, res) => {
   const { email, password } = req.body;
@@ -66,7 +65,6 @@ exports.login = async (req, res) => {
   }
 };
 
-
 // Fungsi Forgot Password
 exports.forgotPassword = async (req, res) => {
   console.log("Forgot password request received:", req.body);
@@ -78,12 +76,8 @@ exports.forgotPassword = async (req, res) => {
       return res.status(404).json({ message: "User not found." });
     }
 
-    // Generate a 4-digit reset token
-    const resetToken = Math.floor(100000 + Math.random() * 900000).toString(); // kode 6 digit
-    user.ResetPasswordToken = resetToken;
-    const adjustedDate = getAdjustedDate();
-    user.ResetTokenExpires = new Date(adjustedDate.getTime() + 3 * 60 * 1000); // Token berlaku selama 3 menit
-    await user.save();
+    // Generate the reset password URL with userId in the query string
+    const resetUrl = `http://localhost:5000/api-filemaster/docs#/Auth/post_api_auth_reset_password?userId=${user.id}`;
 
     // Setup Nodemailer
     const transporter = nodemailer.createTransport({
@@ -96,12 +90,11 @@ exports.forgotPassword = async (req, res) => {
       },
     });
 
-    // const resetUrl = `http://localhost:5000/api/auth/reset-password?token=${resetToken}`;
     await transporter.sendMail({
-      from: `"SIRQU" <${process.env.EMAIL_USER}>`,
+      from: `"File Master" <${process.env.EMAIL_USER}>`,
       to: email,
-      subject: "Password Reset",
-      html: `<p>You requested a password reset. Your reset token is: <strong style="font-size: 24px;">${resetToken}</strong>. It is valid for 3 minutes.</p>`,
+      subject: "Password Reset Request",
+      html: `<p>You requested a password reset. Please use the following link to reset your password: <a href="${resetUrl}">Reset Password</a></p>`,
     });
 
     res.status(200).json({ message: "Reset link sent to email." });
@@ -111,55 +104,32 @@ exports.forgotPassword = async (req, res) => {
   }
 };
 
-
 // Fungsi Reset Password
 exports.resetPassword = async (req, res) => {
-  const { token, newPassword } = req.body;
+  const { newPassword } = req.body;
+  const { userId } = req.query;  // Ambil userId dari query string
 
-  // Regex untuk memvalidasi password
   const passwordRegex = /^[A-Z].*\d$/;
 
+  // Validasi password baru
   if (!passwordRegex.test(newPassword)) {
     return res.status(400).json({
-      message: "Password harus diawali dengan huruf kapital dan diakhiri dengan angka.",
+      message:
+        "Password harus diawali dengan huruf kapital dan diakhiri dengan angka.",
     });
   }
 
   try {
-    const adjustedDate = getAdjustedDate();
-
-    const user = await User.findOne({
-      where: {
-        ResetPasswordToken: token,
-        ResetTokenExpires: { [Op.gt]: adjustedDate }, // Memeriksa apakah token masih berlaku
-      },
-    });
-
-    if (user) {
-      console.log("ResetTokenExpires:", user.ResetTokenExpires);
-      console.log("Adjusted Date:", adjustedDate);
-    }
+    // Cari user berdasarkan userId
+    const user = await User.findOne({ where: { id: userId } });
 
     if (!user) {
-      console.log("User tidak ditemukan atau token kadaluarsa.");
-      return res.status(400).json({ message: "Invalid or expired token." });
-    } else {
-      console.log("User ditemukan:", user);
+      return res.status(404).json({ message: "User tidak ditemukan." });
     }
 
     const hashedPassword = await argon2.hash(newPassword);
 
-    await User.update(
-      {
-        password: hashedPassword,
-        ResetPasswordToken: null,
-        ResetTokenExpires: null,
-        updatedAt: adjustedDate,
-      },
-      {
-        where: { id: user.id },
-      }
-    );
+    await User.update({ password: hashedPassword }, { where: { id: user.id } });
 
     res.status(200).json({ message: "Password berhasil direset." });
   } catch (error) {
@@ -167,5 +137,4 @@ exports.resetPassword = async (req, res) => {
     res.status(500).json({ message: "Terjadi kesalahan server." });
   }
 };
-
 

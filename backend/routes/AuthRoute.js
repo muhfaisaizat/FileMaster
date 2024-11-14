@@ -1,5 +1,9 @@
-const express = require('express');
-const { login, forgotPassword, resetPassword } = require('../controllers/AuthController.js');
+const express = require("express");
+const {
+  login,
+  forgotPassword,
+  resetPassword,
+} = require("../controllers/AuthController.js");
 const router = express.Router();
 
 /**
@@ -33,7 +37,7 @@ const router = express.Router();
  *       500:
  *         description: Failed to login
  */
-router.post('/login', login);
+router.post("/login", login);
 
 /**
  * @swagger
@@ -61,14 +65,14 @@ router.post('/login', login);
  *       500:
  *         description: Server error.
  */
-router.post('/forgot-password', forgotPassword);
+router.post("/forgot-password", forgotPassword);
 
 /**
  * @swagger
  * /api/auth/reset-password:
  *   post:
  *     summary: Reset the user's password
- *     description: Resets the user's password using the provided token.
+ *     description: Resets the user's password using the provided new password.
  *     tags: [Auth]
  *     requestBody:
  *       required: true
@@ -77,19 +81,25 @@ router.post('/forgot-password', forgotPassword);
  *           schema:
  *             type: object
  *             properties:
- *               token:
- *                 type: string
- *                 example: token
  *               newPassword:
  *                 type: string
  *                 example: Newpassword123
+ *     parameters:
+ *       - in: query
+ *         name: userId
+ *         required: true
+ *         schema:
+ *           type: string
+ *           example: 123
  *     responses:
  *       200:
- *         description: Password has been reset.
+ *         description: Password berhasil direset.
  *       400:
- *         description: Invalid or expired token.
+ *         description: Format password tidak valid.
+ *       404:
+ *         description: User tidak ditemukan.
  *       500:
- *         description: Server error.
+ *         description: Terjadi kesalahan server.
  */
 router.post('/reset-password', resetPassword);
 
