@@ -8,7 +8,9 @@ import { Eye, EyeSlash } from 'iconsax-react';
 import { useNavigate } from "react-router-dom";
 import { useToast } from '@/hooks/use-toast';
 import { ToastAction } from "@/components/ui/toast";
-import { Toaster } from "@/components/ui/toaster"
+import { Toaster } from "@/components/ui/toaster";
+import { API_URL } from "../../../helpers/networt";
+import axios from 'axios';
 
 const obfuscateEmail = (email) => {
     const [localPart, domain] = email.split('@'); // Memisahkan bagian sebelum dan sesudah '@'
@@ -147,15 +149,28 @@ const ForgotPassword = () => {
             return;
         }
         try {
-            // await axios.post(`${API_URL}/api/auth/forgot-password`, {
-            //     email,
-            // });
-            toast({
-                title: "Suscces",
-                description: "Email berhasil terverifikasi, silakan ganti sandi anda.",
-                action: <ToastAction altText="Try again">Cancel</ToastAction>,
-            });
-            setStep(3);
+            await axios.get(`${API_URL}/api/auth/check-email/${email}`)
+            .then(response => {
+              // Mengecek apakah email ditemukan dan verifikasi berhasil
+              if (response.data.exists) {
+                // Menampilkan toast jika email terverifikasi
+                toast({
+                  title: "Success",
+                  description: "Email berhasil terverifikasi, silakan ganti sandi anda.",
+                  action: <ToastAction altText="Try again">Cancel</ToastAction>,
+                });
+                
+                // Melanjutkan ke step 3 jika email terverifikasi
+                setStep(3);
+              } else {
+                // Menampilkan toast jika email tidak terverifikasi
+                toast({
+                  title: "Error",
+                  description: "Email tidak terverifikasi. Silakan coba lagi.",
+                  action: <ToastAction altText="Try again">Try Again</ToastAction>,
+                });
+              }
+            })
         } catch (error) {
             console.error("Login failed:", error);
             const errorMessage = error.response ? error.response.data.message : "Something went wrong";
@@ -179,10 +194,10 @@ const ForgotPassword = () => {
             return;
         }
         try {
-            // await axios.post(`${API_URL}/api/auth/reset-password`, {
-            //     token: otpString,
-            //     newPassword: password
-            // });
+            await axios.put(`${API_URL}/api/auth/lupa-password`, {
+                email: email,
+                newPassword: password
+            });
             toast({
                 title: "Suscces",
                 description: "Password sudah diperbarui , silakan login.",
@@ -190,7 +205,7 @@ const ForgotPassword = () => {
             });
             navigate('/');
         } catch (error) {
-            console.error("Login failed:", error);
+            // console.error("Login failed:", error);
             const errorMessage = error.response ? error.response.data.message : "Something went wrong";
             toast({
                 variant: "destructive",
