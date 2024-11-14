@@ -72,7 +72,7 @@ const EditProfile = ({ isOpen, setIsOpen, selectedProductEdit }) => {
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
     const [formData, setFormData] = useState({
         nama: selectedProductEdit.nama,
-        email: selectedProductEdit.nama,
+        email: selectedProductEdit.email,
         password: selectedProductEdit.nama,
         confirmPassword: selectedProductEdit.nama,
         role: selectedProductEdit.role,
@@ -81,7 +81,7 @@ const EditProfile = ({ isOpen, setIsOpen, selectedProductEdit }) => {
     useEffect(() => {
         setFormData({
             nama: selectedProductEdit.nama,
-            email: selectedProductEdit.nama,
+            email: selectedProductEdit.email,
             password: selectedProductEdit.nama,
             confirmPassword: selectedProductEdit.nama,
             role: selectedProductEdit.role,

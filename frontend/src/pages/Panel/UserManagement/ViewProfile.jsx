@@ -75,7 +75,7 @@ const ViewProfile = ({ isOpen, setIsOpen, selectedProduct }) => {
                             </tr>
                             <tr>
                                 <td className=' w-[37%] py-4 text-slate-500'>Email</td>
-                                <td className=' w-[63%] py-4'>{selectedProduct.nama}</td>
+                                <td className=' w-[63%] py-4'>{selectedProduct.email}</td>
                             </tr>
                             <tr>
                                 <td className=' w-[37%] py-4 text-slate-500'>Status</td>
