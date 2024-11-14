@@ -7,6 +7,7 @@ const DetailProjectUtamaRoutes = require('./routes/DetailProjectUtamaRoute');
 const DetailProjectPendukungRoutes = require('./routes/DetailProjectPendukungRoute');
 const AuthRoutes = require("./routes/AuthRoute");
 const UserRoutes = require("./routes/UserRoute");
+const LogAktivitasRoutes = require("./routes/LogAktivitasRoute")
 const swaggerDocs = require("./swagger");
 
 dotenv.config();
@@ -37,6 +38,7 @@ app.use("/api/users", UserRoutes);
 app.use("/api/projects", projectRoutes);
 app.use('/api/detail-project-utama', DetailProjectUtamaRoutes);
 app.use('/api/detail-project-pendukung', DetailProjectPendukungRoutes);
+app.use('/api/log-aktivitas', LogAktivitasRoutes);
 
 // Swagger Documentation
 swaggerDocs(app);

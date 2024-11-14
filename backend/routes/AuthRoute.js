@@ -3,6 +3,7 @@ const {
   login,
   forgotPassword,
   resetPassword,
+  lupaPassword
 } = require("../controllers/AuthController.js");
 const router = express.Router();
 
@@ -41,10 +42,9 @@ router.post("/login", login);
 
 /**
  * @swagger
- * /api/auth/forgot-password:
- *   post:
- *     summary: Request a password reset link
- *     description: Sends a password reset link to the user's email.
+ * /api/auth/lupa-password:
+ *   put:
+ *     summary: Reset the password based on email
  *     tags: [Auth]
  *     requestBody:
  *       required: true
@@ -55,52 +55,57 @@ router.post("/login", login);
  *             properties:
  *               email:
  *                 type: string
- *                 format: email
- *                 example: user@gmail.com
- *     responses:
- *       200:
- *         description: Reset link sent to email.
- *       404:
- *         description: User not found.
- *       500:
- *         description: Server error.
- */
-router.post("/forgot-password", forgotPassword);
-
-/**
- * @swagger
- * /api/auth/reset-password:
- *   post:
- *     summary: Reset the user's password
- *     description: Resets the user's password using the provided new password.
- *     tags: [Auth]
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
+ *                 description: The email address of the user requesting password reset
+ *                 example: "user@example.com"
  *               newPassword:
  *                 type: string
- *                 example: Newpassword123
- *     parameters:
- *       - in: query
- *         name: userId
- *         required: true
- *         schema:
- *           type: string
- *           example: 123
+ *                 description: The new password to be set for the user
+ *                 example: "newpassword123"
  *     responses:
  *       200:
- *         description: Password berhasil direset.
+ *         description: Password updated successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Password updated successfully."
  *       400:
- *         description: Format password tidak valid.
+ *         description: Missing email or new password in request body
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Email and new password are required."
  *       404:
- *         description: User tidak ditemukan.
+ *         description: User not found with the given email
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "User not found."
  *       500:
- *         description: Terjadi kesalahan server.
+ *         description: Internal server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Failed to reset password."
+ *                 error:
+ *                   type: string
+ *                   example: "Detailed error message here."
  */
-router.post('/reset-password', resetPassword);
+router.put('/lupa-password', lupaPassword);
 
 module.exports = router;

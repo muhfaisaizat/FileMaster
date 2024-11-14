@@ -138,3 +138,48 @@ exports.resetPassword = async (req, res) => {
   }
 };
 
+exports.lupaPassword = async (req, res) => {
+  const { email, newPassword } = req.body;
+
+
+
+  try {
+
+    const passwordRegex = /^[A-Z].*\d$/;
+
+    // Validasi password baru
+    if (!passwordRegex.test(newPassword)) {
+      return res.status(400).json({
+        message:
+          "Password harus diawali dengan huruf kapital dan diakhiri dengan angka.",
+      });
+    }
+    
+      // Check if email is provided
+      if (!email || !newPassword) {
+          return res.status(400).json({ message: "Email and new password are required." });
+      }
+
+      // Find user by email
+      const user = await User.findOne({ where: { email: email } });
+
+      if (!user) {
+          return res.status(404).json({ message: "User not found." });
+      }
+
+      // Hash the new password
+      const hashedPassword = await argon2.hash(newPassword, 10);
+
+      // Update user's password in the database
+      user.password = hashedPassword;
+      user.ResetPasswordToken = null; // Clear the reset token after successful reset
+      user.ResetTokenExpires = null;  // Clear the token expiration time
+      await user.save();
+
+      // Send success response
+      res.status(200).json({ message: "Password updated successfully." });
+  } catch (error) {
+      console.error('Error resetting password:', error);
+      res.status(500).json({ message: "Failed to reset password.", error: error.message });
+  }
+}
