@@ -104,31 +104,17 @@ router.get('/:id', detailProjectUtamaController.getDetailProjectUtamaById);
 
 /**
  * @swagger
- * /api/detail-project-utama/{id_project}:
+ * /api/detail-project-utama/{id}:
  *   put:
  *     summary: Update the file for a specific DetailProjectUtama entry by project ID, other_file, and pekerjaan
  *     tags: [DetailProjectUtama]
  *     parameters:
  *       - in: path
- *         name: id_project
+ *         name: id
  *         required: true
- *         description: The ID of the project
  *         schema:
  *           type: integer
- *       - in: query
- *         name: pekerjaan
- *         required: true
- *         description: The type of pekerjaan (F1, F2, F3, F4)
- *         schema:
- *           type: string
- *           enum: [F1, F2, F3, F4]
- *       - in: query
- *         name: other_file
- *         required: true
- *         description: The additional file related to the project
- *         schema:
- *           type: string
- *           enum: ['Form F3.pdf', 'Form F3.docx', 'Gambar.pdf', 'Analisa Struktur.pdf', 'Spek Teknis.pdf', 'Perhitungan Air Hujan.pdf', 'Perhitungan Air Bersih.pdf', 'Perhitungan Air Kotor.pdf', 'Kajian dan Simak (SLF).pdf']
+ *         description: ID of the detail project utama
  *     requestBody:
  *       required: true
  *       content:
@@ -148,43 +134,29 @@ router.get('/:id', detailProjectUtamaController.getDetailProjectUtamaById);
  *       400:
  *         description: Error updating DetailProjectUtama
  */
-router.put('/:id', upload, detailProjectUtamaController.updateDetailProjectUtama);
+router.put('/:id', detailProjectUtamaController.updateDetailProjectUtama);
 
 /**
  * @swagger
  * /api/detail-project-utama/{id}:
  *   delete:
- *     summary: Delete a DetailProjectUtama entry by id_project, pekerjaan, and other_file
- *     tags: [DetailProjectUtama]
+ *     summary: Delete detail project utama by ID
+ *     tags:  [DetailProjectUtama]
  *     parameters:
  *       - in: path
  *         name: id
  *         required: true
- *         description: The id_project of the detail project utama
  *         schema:
  *           type: integer
- *       - in: path
- *         name: pekerjaan
- *         required: true
- *         description: The pekerjaan type for the detail project utama (e.g., 'F1', 'F2', 'F3', 'F4')
- *         schema:
- *           type: string
- *           enum: [F1, F2, F3, F4]
- *       - in: query
- *         name: other_file
- *         required: false
- *         description: The name of the other file associated with the detail project utama
- *         schema:
- *           type: string
- *           enum: ['Form F3.pdf', 'Form F3.docx', 'Gambar.pdf', 'Analisa Struktur.pdf', 'Spek Teknis.pdf', 'Perhitungan Air Hujan.pdf', 'Perhitungan Air Bersih.pdf', 'Perhitungan Air Kotor.pdf', 'Kajian dan Simak (SLF).pdf']
+ *         description: ID of the detail project utama
  *     responses:
- *       204:
- *         description: DetailProjectUtama deleted successfully
+ *       200:
+ *         description: detail project utama deleted successfully
  *       404:
- *         description: DetailProjectUtama not found
- *       400:
- *         description: Bad request - missing or invalid parameters
+ *         description: detail project utama not found
+ *       500:
+ *         description: Error deleting detail project utama
  */
-router.delete('/:id/:pekerjaan', detailProjectUtamaController.deleteDetailProjectUtama);
+router.delete('/:id',detailProjectUtamaController.deleteDetailProjectUtama);
 
 module.exports = router;

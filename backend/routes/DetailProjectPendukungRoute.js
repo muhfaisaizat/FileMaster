@@ -154,37 +154,23 @@ router.put('/:id', upload, detailProjectPendukungController.updateDetailProjectP
  * @swagger
  * /api/detail-project-pendukung/{id}:
  *   delete:
- *     summary: Delete a DetailProjectPendukung entry by id_project, pekerjaan, and other_file
+ *     summary: Delete detail project pendukung by ID
  *     tags: [DetailProjectPendukung]
  *     parameters:
  *       - in: path
  *         name: id
  *         required: true
- *         description: The id_project of the detail project pendukung
  *         schema:
  *           type: integer
- *       - in: path
- *         name: pekerjaan
- *         required: true
- *         description: The pekerjaan type for the detail project pendukung (e.g., 'F1', 'F2', 'F3', 'F4')
- *         schema:
- *           type: string
- *           enum: [F1, F2, F3, F4]
- *       - in: query
- *         name: other_file
- *         required: false
- *         description: The name of the other file associated with the detail project pendukung
- *         schema:
- *           type: string
- *           enum: ['Form F3.pdf', 'Form F3.docx', 'Gambar.pdf', 'Analisa Struktur.pdf', 'Spek Teknis.pdf', 'Perhitungan Air Hujan.pdf', 'Perhitungan Air Bersih.pdf', 'Perhitungan Air Kotor.pdf', 'Kajian dan Simak (SLF).pdf']
+ *         description: ID of the detail project pendukung
  *     responses:
- *       204:
- *         description: DetailProjectPendukung deleted successfully
+ *       200:
+ *         description: detail project pendukung deleted successfully
  *       404:
- *         description: DetailProjectPendukung not found
- *       400:
- *         description: Bad request - missing or invalid parameters
+ *         description: detail project pendukung not found
+ *       500:
+ *         description: Error deleting detail project pendukung
  */
-router.delete('/:id/:pekerjaan', detailProjectPendukungController.deleteDetailProjectPendukung);
+router.delete('/:id', detailProjectPendukungController.deleteDetailProjectPendukung);
 
 module.exports = router;
