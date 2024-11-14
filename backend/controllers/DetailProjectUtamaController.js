@@ -1,7 +1,7 @@
 const DetailProjectUtama = require('../models/DetailProjectUtama');
 const Project = require('../models/Project'); // Pastikan path ini benar
 const upload = require('../middleware/uploadFile'); // Middleware for file upload
-const fs = require('fs').promises;
+const fs = require('fs');
 const path = require('path');
 
 
@@ -134,8 +134,6 @@ exports.getDetailProjectUtamaById = async (req, res) => {
 exports.updateDetailProjectUtama = async (req, res) => {
     try {
         const projectId = req.params.id;
-
-        // Find the detail project record by id_project_utama
         const detail = await DetailProjectUtama.findOne({
             where: { id_project_utama: projectId }
         });
@@ -144,47 +142,32 @@ exports.updateDetailProjectUtama = async (req, res) => {
             return res.status(404).json({ message: 'Detail project utama not found' });
         }
 
-        const oldFileName = detail.file;
-        const newFile = req.files && req.files.file;
+        const oldFileName = req.body.oldFileName || detail.file; // Nama file lama, jika ada
+        const newFile = req.file; // File baru yang di-upload
 
         if (newFile) {
-            const newFilePath = path.join(__dirname, '..', 'uploads', newFile.name);
-
-            // Delete the old file if it exists
-            if (oldFileName) {
-                const oldFilePath = path.join(__dirname, '..', 'uploads', oldFileName);
-
-                try {
-                    await fs.unlink(oldFilePath);  // Wait for the old file to be deleted
-                    console.log('Old file deleted successfully');
-                } catch (err) {
+            // Hapus file lama
+            const oldFilePath = path.join(__dirname, '..', 'uploads', oldFileName);
+            fs.unlink(oldFilePath, (err) => {
+                if (err) {
                     console.error("Error deleting old file:", err);
                     return res.status(500).json({ message: 'Error deleting old file', error: err.message });
                 }
-            }
+                console.log('Old file deleted successfully');
+            });
 
-            // Save the new file
-            try {
-                await newFile.mv(newFilePath);  // Wait for the file to be moved
-                console.log('New file saved successfully');
-            } catch (err) {
-                console.error("Error saving new file:", err);
-                return res.status(500).json({ message: 'Error saving new file', error: err.message });
-            }
-
-            // Update the record in the database
-            detail.file = newFile.name;
+            // Update file baru dan simpan perubahan di database
+            detail.file = newFile.filename;
             detail.updatedAt = new Date();
             await detail.save();
 
             res.status(200).json({ message: 'Detail project utama updated successfully', detail });
         } else {
-            // No file is uploaded, just update the timestamp
+            // Jika tidak ada file baru, hanya update timestamp
             detail.updatedAt = new Date();
             await detail.save();
             res.status(200).json({ message: 'Detail project utama updated (no file change)', detail });
         }
-
     } catch (error) {
         console.error("Error:", error);
         res.status(500).json({ message: 'Error updating detail project utama', error: error.message });

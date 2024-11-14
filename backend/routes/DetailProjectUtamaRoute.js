@@ -3,6 +3,7 @@ const express = require('express');
 const router = express.Router();
 const detailProjectUtamaController = require('../controllers/DetailProjectUtamaController');
 const upload = require('../middleware/uploadFile'); // Middleware for file upload
+const gantifile = require('../middleware/gantiFile'); // Middleware for file upload
 
 /**
  * @swagger
@@ -126,6 +127,9 @@ router.get('/:id', detailProjectUtamaController.getDetailProjectUtamaById);
  *                 type: string
  *                 format: binary
  *                 description: New file to update for the detail project utama
+ *               oldFileName:
+ *                 type: string
+ *                 description: The old file name (optional)
  *     responses:
  *       200:
  *         description: DetailProjectUtama file updated successfully
@@ -134,7 +138,7 @@ router.get('/:id', detailProjectUtamaController.getDetailProjectUtamaById);
  *       400:
  *         description: Error updating DetailProjectUtama
  */
-router.put('/:id', detailProjectUtamaController.updateDetailProjectUtama);
+router.put('/:id', gantifile, detailProjectUtamaController.updateDetailProjectUtama);
 
 /**
  * @swagger
