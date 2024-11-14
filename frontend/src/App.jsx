@@ -4,7 +4,9 @@ import viteLogo from '/vite.svg'
 // import './App.css'
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import MainAuth from './pages/Auth/MainAuth/MainAuth';
-import MainPanel from './pages/Panel/MainPanel/MainPanel'
+import MainPanel from './pages/Panel/MainPanel/MainPanel';
+import ProtectedRoute from './protectedRoute.jsx';
+import PublicRoute from './publicRoute.jsx';
 
 
 function App() {
@@ -13,9 +15,9 @@ function App() {
   return (
     <Router>
     <Routes>
-      <Route path="/" element={<MainAuth/>} />
-      <Route path="/auth/*" element={<MainAuth/>} />
-      <Route path="/panel/*" element={<MainPanel/>} />
+      <Route path="/" element={<PublicRoute element={MainAuth} />} />
+      <Route path="/auth/*" element={<PublicRoute element={MainAuth} />} />
+      <Route path="/panel/*" element={<ProtectedRoute element={<MainPanel />} />} />
     </Routes>
   </Router>
   )

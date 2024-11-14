@@ -152,12 +152,10 @@ const ForgotPassword = () => {
             // });
             toast({
                 title: "Suscces",
-                description: "Email berhasil terkirim , cek email anda.",
+                description: "Email berhasil terverifikasi, silakan ganti sandi anda.",
                 action: <ToastAction altText="Try again">Cancel</ToastAction>,
             });
-            setStep(2);
-            setTimer(180);
-            setIsTimerActive(true);
+            setStep(3);
         } catch (error) {
             console.error("Login failed:", error);
             const errorMessage = error.response ? error.response.data.message : "Something went wrong";

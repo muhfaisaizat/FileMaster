@@ -14,8 +14,8 @@ import { useNavigate } from "react-router-dom";
 
 const Logout = () => {
     const navigate = useNavigate();
-    // const nama = localStorage.getItem("name");
-    // const email = localStorage.getItem("email");
+    const nama = localStorage.getItem("name");
+    const email = localStorage.getItem("email");
     
     return (
 
@@ -36,16 +36,18 @@ const Logout = () => {
                         <AvatarFallback>CN</AvatarFallback>
                     </Avatar>
                     <div className='grid gap-[4px]'>
-                    <h2 className='text-[14px] font-bold'>Admin</h2>
-                    <p className='text-[12px] font-normal'>Admin@gmail.com</p>
+                    <h2 className='text-[14px] font-bold'>{nama}</h2>
+                    <p className='text-[12px] font-normal'>{email}</p>
                     </div>
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem  onClick={(e) => {
-                //   e.preventDefault();
-                //   localStorage.removeItem("token");
-                //   localStorage.removeItem("name");
-                //   localStorage.removeItem("email");
+                  e.preventDefault();
+                  localStorage.removeItem("token");
+                  localStorage.removeItem("name");
+                  localStorage.removeItem("email");
+                  localStorage.removeItem("savedEmail");
+                  localStorage.removeItem("savedPassword");
                   navigate("/");
                 }} className="py-3 px-[19px] gap-[12px] text-[14px] font-semibold"> <IconLogout variant='Bold'/>Logout</DropdownMenuItem>
             </DropdownMenuContent>

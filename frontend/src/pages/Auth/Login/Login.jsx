@@ -8,13 +8,16 @@ import { Eye, EyeSlash } from 'iconsax-react';
 import { useNavigate } from "react-router-dom";
 import { useToast } from '@/hooks/use-toast';
 import { ToastAction } from "@/components/ui/toast";
-import { Toaster } from "@/components/ui/toaster"
+import { Toaster } from "@/components/ui/toaster";
+import { API_URL } from "../../../helpers/networt";
+import axios from 'axios';
 
 const Login = () => {
     const { toast } = useToast();
     const navigate = useNavigate();
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [rememberMe, setRememberMe] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
     const togglePasswordVisibility = () => {
         setShowPassword(!showPassword);
@@ -23,39 +26,36 @@ const Login = () => {
     const handleLogin = async (e) => {
         e.preventDefault();
         navigate("/panel");
-        // try {
-        //     const response = await axios.post(`${API_URL}/api/auth/login`, {
-        //       email,
-        //       password,
-        //     });
-        //     const userRole = response.data.user.role;
-        //     const info =response.data.message;
-        //     localStorage.setItem("token", response.data.token);
-        //     localStorage.setItem("name", response.data.user.name);
-        //     localStorage.setItem("email", response.data.user.email);
-        //     localStorage.setItem("id", response.data.user.id);
-
-
-        //     if (userRole === "Admin") {
-        //       navigate("/admin-panel");
-        //     } else {
-        //       toast({
-        //         variant: "destructive",
-        //         title: "Error!",
-        //         description: info,
-        //         action: <ToastAction altText="Try again">Cancel</ToastAction>,
-        //     }); 
-        //     }
-        //   } catch (error) {
-        //     console.error("Login failed:", error);
-        //     const errorMessage = error.response ? error.response.data.message : "Something went wrong";
-        //     toast({
-        //         variant: "destructive",
-        //         title: "Login Failed",
-        //         description: errorMessage,  // Pesan error dari response atau fallback
-        //         action: <ToastAction altText="Try again">Cancel</ToastAction>,
-        //     });
-        //   }
+        try {
+            const response = await axios.post(`${API_URL}/api/auth/login`, {
+              email,
+              password,
+            });
+            const userRole = response.data.user.role;
+            const info =response.data.message;
+            localStorage.setItem("token", response.data.token);
+            localStorage.setItem("name", response.data.user.name);
+            localStorage.setItem("email", response.data.user.email);
+            localStorage.setItem("id", response.data.user.id);
+            if (rememberMe) {
+                localStorage.setItem("savedEmail", email);
+                localStorage.setItem("savedPassword", password);
+                navigate("/panel"); // Navigasi hanya jika "Ingat Saya" dicentang
+            } else {
+                localStorage.removeItem("savedEmail");
+                localStorage.removeItem("savedPassword");
+                navigate("/panel"); // Tetap navigasi ke /panel setelah login berhasil
+            }
+          } catch (error) {
+            console.error("Login failed:", error);
+            const errorMessage = error.response ? error.response.data.message : "Something went wrong";
+            toast({
+                variant: "destructive",
+                title: "Login Failed",
+                description: errorMessage,  // Pesan error dari response atau fallback
+                action: <ToastAction altText="Try again">Cancel</ToastAction>,
+            });
+          }
     }
     return (
         <div className="container mx-auto flex justify-center items-center min-h-screen">
@@ -104,9 +104,9 @@ const Login = () => {
                     </div>
                     <div className="flex items-center">
                         <div className="flex items-center space-x-2">
-                            <Checkbox id="terms" />
+                            <Checkbox id="rememberMe"   onChange={(e) => setRememberMe(e.target.checked)} />
                             <label
-                                htmlFor="terms"
+                                 htmlFor="rememberMe"
                                 className="text-[14px] font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
                             >
                                 Ingat Saya
