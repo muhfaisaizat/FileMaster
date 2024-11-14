@@ -31,3 +31,6 @@ Pastikan sudah menginstal:
 3. Jalankan server frontend: `npm run dev` atau `yarn dev`
 4. Frontend akan berjalan di `http://localhost:5173`
 
+Untuk login menggunakan dummy account admin:\
+`Email : admin@gmail.com`
+`Password : Admin123`
