@@ -50,6 +50,7 @@ const AddProject = ({ className }) => {
     const [subDistricts, setSubDistricts] = useState([]);
     const [selectedDistricts, setSelectedDistricts] = useState('');
     const [subvillages, setsubvillages] = useState([]);
+    const [selectedvillage, setSelectedvillage] = useState('');
 
     // Fetch provinces when the component mounts
     useEffect(() => {
@@ -93,19 +94,28 @@ const AddProject = ({ className }) => {
         setSubDistricts([]); // Reset sub-districts
         setSelectedDistricts('');
         setsubvillages([]);
+        setSelectedvillage('');
         //   alert(selectedProvince)
     };
 
     const handleRegencyChange = (value) => {
         setSelectedRegency(value);
         setSubDistricts([]); // Reset sub-districts when a new regency is selected
+        setSelectedDistricts('');
+        setSelectedvillage('');
     };
 
     const handleDistrictsChange = (value) => {
         setSelectedDistricts(value);
         setsubvillages([]); // Reset sub-districts when a new regency is selected
-
+        setSelectedvillage('');
     };
+
+    const handleVilagesChange = (value) => {
+        setSelectedvillage(value);
+    
+      };
+    
 
     const [currentStep, setCurrentStep] = useState(0);
     const [ContentStep, setContentStep] = useState(0);
@@ -308,7 +318,7 @@ const AddProject = ({ className }) => {
                                             </div>
                                         </div>
                                         <div className='lg:w-[68%] md:w-1/2 w-full px-4'>
-                                            <Select onValueChange={handleProvinceChange}>
+                                            <Select onValueChange={handleProvinceChange} value={selectedProvince}>
                                                 <SelectTrigger className="w-full h-[36px] text-[14px]">
                                                     <SelectValue placeholder="Pilih Provinsi" />
                                                 </SelectTrigger>
@@ -332,7 +342,7 @@ const AddProject = ({ className }) => {
                                             </div>
                                         </div>
                                         <div className='lg:w-[68%] md:w-1/2 w-full px-4'>
-                                            <Select onValueChange={handleRegencyChange} disabled={!selectedProvince}>
+                                            <Select onValueChange={handleRegencyChange} disabled={!selectedProvince} value={selectedRegency}>
                                                 <SelectTrigger className="w-full h-[36px] text-[14px]">
                                                     <SelectValue placeholder="Pilih Salah Satu" />
                                                 </SelectTrigger>
@@ -356,7 +366,7 @@ const AddProject = ({ className }) => {
                                             </div>
                                         </div>
                                         <div className='lg:w-[68%] md:w-1/2 w-full px-4'>
-                                            <Select onValueChange={handleDistrictsChange} disabled={!selectedRegency}>
+                                            <Select onValueChange={handleDistrictsChange} disabled={!selectedRegency} value={selectedDistricts}>
                                                 <SelectTrigger className="w-full h-[36px] text-[14px]">
                                                     <SelectValue placeholder="Pilih Salah Satu" />
                                                 </SelectTrigger>
@@ -380,7 +390,7 @@ const AddProject = ({ className }) => {
                                             </div>
                                         </div>
                                         <div className='lg:w-[68%] md:w-1/2 w-full px-4'>
-                                            <Select disabled={!selectedDistricts}>
+                                            <Select onValueChange={handleVilagesChange}  disabled={!selectedDistricts} value={selectedvillage}>
                                                 <SelectTrigger className="w-full h-[36px] text-[14px]">
                                                     <SelectValue placeholder="Pilih Salah Satu" />
                                                 </SelectTrigger>

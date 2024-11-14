@@ -57,16 +57,87 @@ const InformasiProyek = () => {
   const [kab, setkab] = useState("Kabupaten A2")
   const [kec, setkec] = useState("Kecamatan A2")
   const [desa, setdesa] = useState("Desa1")
-  const [selectedProvince, setSelectedProvince] = useState(provinsi);
-  const [selectedRegency, setSelectedRegency] = useState(kab);
-  const [regencies, setRegencies] = useState([]);
-  const [subDistricts, setSubDistricts] = useState([]);
 
+
+  const [provinces, setProvinces] = useState([]);
+  const [selectedProvince, setSelectedProvince] = useState('35');
+  const [regencies, setRegencies] = useState([]);
+  const [selectedRegency, setSelectedRegency] = useState('3573');
+  const [subDistricts, setSubDistricts] = useState([]);
+  const [selectedDistricts, setSelectedDistricts] = useState('3573050');
+  const [subvillages, setsubvillages] = useState([]);
+  const [selectedvillage, setSelectedvillage] = useState('3573050006');
+
+  // Fetch provinces when the component mounts
   useEffect(() => {
-    // Set initial regencies and subDistricts based on default province and regency
-    setRegencies(Object.keys(indonesiaData[selectedProvince] || {}));
-    setSubDistricts(indonesiaData[selectedProvince][kab] || []);
-  }, [selectedProvince, kab]);
+    fetch(`https://www.emsifa.com/api-wilayah-indonesia/api/provinces.json`)
+      .then(response => response.json())
+      .then(provinces => setProvinces(provinces));
+  }, []);
+
+  // Fetch regencies when a province is selected
+  useEffect(() => {
+    if (selectedProvince) {
+      fetch(`https://www.emsifa.com/api-wilayah-indonesia/api/regencies/${selectedProvince}.json`)
+        .then(response => response.json())
+        .then(regencies => setRegencies(regencies));
+    }
+  }, [selectedProvince]);
+
+  // Fetch sub-districts when a regency is selected
+  useEffect(() => {
+    if (selectedRegency) {
+      fetch(`https://www.emsifa.com/api-wilayah-indonesia/api/districts/${selectedRegency}.json`)
+        .then(response => response.json())
+        .then(districts => setSubDistricts(districts));
+
+    }
+  }, [selectedRegency]);
+
+  // Fetch sub-districts when a regency is selected
+  useEffect(() => {
+    if (selectedDistricts) {
+      fetch(`https://www.emsifa.com/api-wilayah-indonesia/api/villages/${selectedDistricts}.json`)
+        .then(response => response.json())
+        .then(data => setsubvillages(data));
+    }
+  }, [selectedDistricts]);
+
+  const handleProvinceChange = (value) => {
+    setSelectedProvince(value);
+    setRegencies([]); // Reset regencies when a new province is selected
+    setSelectedRegency('');
+    setSubDistricts([]); // Reset sub-districts
+    setSelectedDistricts('');
+    setsubvillages([]);
+    setSelectedvillage('');
+    //   alert(selectedProvince)
+  };
+
+  const handleRegencyChange = (value) => {
+    setSelectedRegency(value);
+    setSubDistricts([]); // Reset sub-districts when a new regency is selected
+    setSelectedDistricts('');
+    setSelectedvillage('');
+  };
+
+  const handleDistrictsChange = (value) => {
+    setSelectedDistricts(value);
+    setsubvillages([]); // Reset sub-districts when a new regency is selected
+    setSelectedvillage('');
+
+  };
+
+  const handleVilagesChange = (value) => {
+    setSelectedvillage(value);
+
+  };
+
+  // useEffect(() => {
+  //   // Set initial regencies and subDistricts based on default province and regency
+  //   setRegencies(Object.keys(indonesiaData[selectedProvince] || {}));
+  //   setSubDistricts(indonesiaData[selectedProvince][kab] || []);
+  // }, [selectedProvince, kab]);
 
   const handleEditDetailClick = () => {
     setIsEditingDetail(!isEditingDetail);
@@ -78,30 +149,30 @@ const InformasiProyek = () => {
     setIsEditingLokasi(!isEditingLokasi);
   };
 
-  const handleProvinceChange = (province) => {
-    setSelectedProvince(province);
-    setprovinsi(province); // Set provinsi state
-    setRegencies(Object.keys(indonesiaData[province] || {}));
-    setSelectedRegency("");
-    setSubDistricts([]);
-    setkab(""); // Reset kabupaten
-    setkec(""); // Reset kecamatan
-    setdesa(""); // Reset desa
-  };
+  // const handleProvinceChange = (province) => {
+  //   setSelectedProvince(province);
+  //   setprovinsi(province); // Set provinsi state
+  //   setRegencies(Object.keys(indonesiaData[province] || {}));
+  //   setSelectedRegency("");
+  //   setSubDistricts([]);
+  //   setkab(""); // Reset kabupaten
+  //   setkec(""); // Reset kecamatan
+  //   setdesa(""); // Reset desa
+  // };
 
-  const handleRegencyChange = (regency) => {
-    setSelectedRegency(regency);
-    setkab(regency); // Set kabupaten state
-    setSubDistricts(indonesiaData[selectedProvince][regency] || []);
-    setkec(""); // Reset kecamatan
-    setdesa(""); // Reset desa
-  };
+  // const handleRegencyChange = (regency) => {
+  //   setSelectedRegency(regency);
+  //   setkab(regency); // Set kabupaten state
+  //   setSubDistricts(indonesiaData[selectedProvince][regency] || []);
+  //   setkec(""); // Reset kecamatan
+  //   setdesa(""); // Reset desa
+  // };
 
-  const handleSubDistrictChange = (subDistrict) => {
-    const [selectedKecamatan, selectedDesa] = subDistrict.split("-");
-    setkec(selectedKecamatan); // Set kecamatan state
-    setdesa(selectedDesa); // Set desa state
-  };
+  // const handleSubDistrictChange = (subDistrict) => {
+  //   const [selectedKecamatan, selectedDesa] = subDistrict.split("-");
+  //   setkec(selectedKecamatan); // Set kecamatan state
+  //   setdesa(selectedDesa); // Set desa state
+  // };
 
   const handleSelectChange = (value) => {
     setSelectedCategory(value);
@@ -377,133 +448,181 @@ const InformasiProyek = () => {
             </div>
             {!isEditingLokasi && (
               <>
-            <div className='flex flex-wrap -m-4 pt-[16px] pb-[32px]'>
-              <div className='lg:w-[32%] md:w-1/2 w-full px-4'>
-                <div className='w-full text-[14px] font-semibold grid gap-[8px] pb-[8px] text-[#717179]'>
-                  <h4>Provinsi</h4>
+                <div className='flex flex-wrap -m-4 pt-[16px] pb-[32px]'>
+                  <div className='lg:w-[32%] md:w-1/2 w-full px-4'>
+                    <div className='w-full text-[14px] font-semibold grid gap-[8px] pb-[8px] text-[#717179]'>
+                      <h4>Provinsi</h4>
+                    </div>
+                  </div>
+                  <div className='lg:w-[68%] md:w-1/2 w-full px-4'>
+                    {provinces
+                      .filter((province) => province.id === selectedProvince)
+                      .map((province) => (
+                        <p className='text-[14px]' key={province.id} value={province.id}>
+                          {province.name}
+                        </p>
+                      ))}
+                  </div>
                 </div>
-              </div>
-              <div className='lg:w-[68%] md:w-1/2 w-full px-4'>
-                <p className='text-[14px]'>{provinsi}</p>
-              </div>
-            </div>
-            <div className='flex flex-wrap -m-4 pt-[16px] pb-[32px]'>
-              <div className='lg:w-[32%] md:w-1/2 w-full px-4'>
-                <div className='w-full text-[14px] font-semibold grid gap-[8px] pb-[8px] text-[#717179]'>
-                  <h4>Kabupaten / Kota</h4>
+                <div className='flex flex-wrap -m-4 pt-[16px] pb-[32px]'>
+                  <div className='lg:w-[32%] md:w-1/2 w-full px-4'>
+                    <div className='w-full text-[14px] font-semibold grid gap-[8px] pb-[8px] text-[#717179]'>
+                      <h4>Kabupaten / Kota</h4>
+                    </div>
+                  </div>
+                  <div className='lg:w-[68%] md:w-1/2 w-full px-4'>
+                  {regencies
+                      .filter((province) => province.id === selectedRegency)
+                      .map((province) => (
+                        <p className='text-[14px]' key={province.id} value={province.id}>
+                          {province.name}
+                        </p>
+                      ))}
+                  </div>
                 </div>
-              </div>
-              <div className='lg:w-[68%] md:w-1/2 w-full px-4'>
-                <p className='text-[14px]'>{kab}</p>
-              </div>
-            </div>
-            <div className='flex flex-wrap -m-4 pt-[16px] pb-[32px]'>
-              <div className='lg:w-[32%] md:w-1/2 w-full px-4'>
-                <div className='w-full text-[14px] font-semibold grid gap-[8px] pb-[8px] text-[#717179]'>
-                  <h4>Kecamatan</h4>
+                <div className='flex flex-wrap -m-4 pt-[16px] pb-[32px]'>
+                  <div className='lg:w-[32%] md:w-1/2 w-full px-4'>
+                    <div className='w-full text-[14px] font-semibold grid gap-[8px] pb-[8px] text-[#717179]'>
+                      <h4>Kecamatan</h4>
+                    </div>
+                  </div>
+                  <div className='lg:w-[68%] md:w-1/2 w-full px-4'>
+                  {subDistricts
+                      .filter((province) => province.id === selectedDistricts)
+                      .map((province) => (
+                        <p className='text-[14px]' key={province.id} value={province.id}>
+                          {province.name}
+                        </p>
+                      ))}
+                  </div>
                 </div>
-              </div>
-              <div className='lg:w-[68%] md:w-1/2 w-full px-4'>
-                <p className='text-[14px]'>{kec}</p>
-              </div>
-            </div>
-            <div className='flex flex-wrap -m-4 pt-[16px] pb-[32px]'>
-              <div className='lg:w-[32%] md:w-1/2 w-full px-4'>
-                <div className='w-full text-[14px] font-semibold grid gap-[8px] pb-[8px] text-[#717179]'>
-                  <h4>Kelurahan / Desa</h4>
+                <div className='flex flex-wrap -m-4 pt-[16px] pb-[32px]'>
+                  <div className='lg:w-[32%] md:w-1/2 w-full px-4'>
+                    <div className='w-full text-[14px] font-semibold grid gap-[8px] pb-[8px] text-[#717179]'>
+                      <h4>Kelurahan / Desa</h4>
+                    </div>
+                  </div>
+                  <div className='lg:w-[68%] md:w-1/2 w-full px-4'>
+                  {subvillages
+                      .filter((province) => province.id === selectedvillage)
+                      .map((province) => (
+                        <p className='text-[14px]' key={province.id} value={province.id}>
+                          {province.name}
+                        </p>
+                      ))}
+                  </div>
                 </div>
-              </div>
-              <div className='lg:w-[68%] md:w-1/2 w-full px-4'>
-                <p className='text-[14px]'>{desa}</p>
-              </div>
-            </div>
-            </>
+              </>
             )}
             {isEditingLokasi && (
               <>
-            <div className='flex flex-wrap -m-4 pt-[16px] pb-[32px]'>
-              <div className='lg:w-[32%] md:w-1/2 w-full px-4'>
-                <div className='w-full text-[14px] font-semibold grid gap-[8px] pb-[8px] text-[#717179]'>
-                  <h4>Provinsi</h4>
+                <div className='flex flex-wrap -m-4 pt-[16px] pb-[32px]'>
+                  <div className='lg:w-[32%] md:w-1/2 w-full px-4'>
+                    <div className='w-full text-[14px] font-semibold grid gap-[8px] pb-[8px] text-[#717179]'>
+                      <h4>Provinsi</h4>
+                    </div>
+                  </div>
+                  <div className='lg:w-[68%] md:w-1/2 w-full px-4'>
+                    <Select onValueChange={handleProvinceChange} value={selectedProvince}>
+                      <SelectTrigger className="w-full h-[36px] text-[14px]">
+                        <SelectValue placeholder="Pilih Provinsi" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectGroup>
+                          <SelectLabel>Provinsi</SelectLabel>
+                          {provinces.map((province) => (
+                            <SelectItem key={province.id} value={province.id}>
+                              {province.name}
+                            </SelectItem>
+                          ))}
+                        </SelectGroup>
+                      </SelectContent>
+                    </Select>
+                  </div>
                 </div>
-              </div>
-              <div className='lg:w-[68%] md:w-1/2 w-full px-4'>
-                <Select onValueChange={handleProvinceChange} value={provinsi}>
-                  <SelectTrigger className="w-full h-[36px] text-[14px]">
-                    <SelectValue placeholder="Pilih Provinsi" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectGroup>
-                      <SelectLabel>Provinsi</SelectLabel>
-                      {Object.keys(indonesiaData).map((province) => (
-                        <SelectItem key={province} value={province}>
-                          {province}
-                        </SelectItem>
-                      ))}
-                    </SelectGroup>
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
-            <div className='flex flex-wrap -m-4 pt-[16px] pb-[32px]'>
-              <div className='lg:w-[32%] md:w-1/2 w-full px-4'>
-                <div className='w-full text-[14px] font-semibold grid gap-[8px] pb-[8px] text-[#717179]'>
-                  <h4>Kabupaten / Kota</h4>
+                <div className='flex flex-wrap -m-4 pt-[16px] pb-[32px]'>
+                  <div className='lg:w-[32%] md:w-1/2 w-full px-4'>
+                    <div className='w-full text-[14px] font-semibold grid gap-[8px] pb-[8px] text-[#717179]'>
+                      <h4>Kabupaten / Kota</h4>
+                    </div>
+                  </div>
+                  <div className='lg:w-[68%] md:w-1/2 w-full px-4'>
+                    <Select onValueChange={handleRegencyChange} disabled={!selectedProvince} value={selectedRegency}>
+                      <SelectTrigger className="w-full h-[36px] text-[14px]">
+                        <SelectValue placeholder="Pilih Salah Satu" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectGroup>
+                          <SelectLabel>Kabupaten / Kota</SelectLabel>
+                          {regencies.map((regency) => (
+                            <SelectItem key={regency.id} value={regency.id}>
+                              {regency.name}
+                            </SelectItem>
+                          ))}
+                        </SelectGroup>
+                      </SelectContent>
+                    </Select>
+                  </div>
                 </div>
-              </div>
-              <div className='lg:w-[68%] md:w-1/2 w-full px-4'>
-                <Select onValueChange={handleRegencyChange} disabled={!selectedProvince} value={kab} >
-                  <SelectTrigger className="w-full h-[36px] text-[14px]">
-                    <SelectValue placeholder="Pilih Salah Satu" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectGroup>
-                      <SelectLabel>Kabupaten / Kota</SelectLabel>
-                      {regencies.map((regency) => (
-                        <SelectItem key={regency} value={regency}>
-                          {regency}
-                        </SelectItem>
-                      ))}
-                    </SelectGroup>
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
-            <div className='flex flex-wrap -m-4 pt-[16px] pb-[32px]'>
-              <div className='lg:w-[32%] md:w-1/2 w-full px-4'>
-                <div className='w-full text-[14px] font-semibold grid gap-[8px] pb-[8px] text-[#717179]'>
-                  <h4>Kecamatan / Desa</h4>
+                <div className='flex flex-wrap -m-4 pt-[16px] pb-[32px]'>
+                  <div className='lg:w-[32%] md:w-1/2 w-full px-4'>
+                    <div className='w-full text-[14px] font-semibold grid gap-[8px] pb-[8px] text-[#717179]'>
+                      <h4>Kecamatan</h4>
+                    </div>
+                  </div>
+                  <div className='lg:w-[68%] md:w-1/2 w-full px-4'>
+                    <Select onValueChange={handleDistrictsChange} disabled={!selectedRegency} value={selectedDistricts}>
+                      <SelectTrigger className="w-full h-[36px] text-[14px]">
+                        <SelectValue placeholder="Pilih Salah Satu" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectGroup>
+                          <SelectLabel>Kecamatan</SelectLabel>
+                          {subDistricts.map((subDistrict) => (
+                            <SelectItem key={subDistrict.id} value={subDistrict.id}>
+                              {subDistrict.name}
+                            </SelectItem>
+                          ))}
+                        </SelectGroup>
+                      </SelectContent>
+                    </Select>
+                  </div>
                 </div>
-              </div>
-              <div className='lg:w-[68%] md:w-1/2 w-full px-4'>
-                <Select onValueChange={handleSubDistrictChange} disabled={!selectedRegency} value={`${kec}-${desa}`}>
-                  <SelectTrigger className="w-full h-[36px] text-[14px]">
-                    <SelectValue placeholder="Pilih Salah Satu" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectGroup>
-                      <SelectLabel>Kecamatan / Desa</SelectLabel>
-                      {subDistricts.map((subDistrict) => (
-                        <SelectItem key={subDistrict} value={subDistrict}>
-                          {subDistrict}
-                        </SelectItem>
-                      ))}
-                    </SelectGroup>
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
-            {isEditingLokasi && (
-              <div className='flex justify-end gap-[8px]'>
-                <Button onClick={handleEditLokasiClick} variant='secondary' className='text-[14px] h-[36px]'>
-                  Batal
-                </Button>
-                <Button onClick={handleEditLokasiClick} className='bg-[#0036AA] h-[36px] text-[14px] hover:bg-[#2b4a8e]'>
-                  Simpan
-                </Button>
-              </div>
-            )}
-            </>
+                <div className='flex flex-wrap -m-4 pt-[16px] pb-[32px]'>
+                  <div className='lg:w-[32%] md:w-1/2 w-full px-4'>
+                    <div className='w-full text-[14px] font-semibold grid gap-[8px] pb-[8px]'>
+                      <h4>Kelurahan/Desa</h4>
+                    </div>
+                  </div>
+                  <div className='lg:w-[68%] md:w-1/2 w-full px-4'>
+                    <Select  onValueChange={handleVilagesChange} disabled={!selectedDistricts} value={selectedvillage}>
+                      <SelectTrigger className="w-full h-[36px] text-[14px]">
+                        <SelectValue placeholder="Pilih Salah Satu" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectGroup>
+                          <SelectLabel>Kelurahan/Desa</SelectLabel>
+                          {subvillages.map((subvillages) => (
+                            <SelectItem key={subvillages.id} value={subvillages.id}>
+                              {subvillages.name}
+                            </SelectItem>
+                          ))}
+                        </SelectGroup>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+                {isEditingLokasi && (
+                  <div className='flex justify-end gap-[8px]'>
+                    <Button onClick={handleEditLokasiClick} variant='secondary' className='text-[14px] h-[36px]'>
+                      Batal
+                    </Button>
+                    <Button onClick={handleEditLokasiClick} className='bg-[#0036AA] h-[36px] text-[14px] hover:bg-[#2b4a8e]'>
+                      Simpan
+                    </Button>
+                  </div>
+                )}
+              </>
             )}
           </div>
         </div>
