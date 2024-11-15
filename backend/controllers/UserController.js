@@ -17,7 +17,7 @@ exports.createUser = async (req, res) => {
         const hashedPassword = await argon2.hash(password);
 
         // Tambahkan path gambar dari req.file jika ada
-        const imagePath = req.file ? `/images/${req.file.filename}` : null;
+        const imagePath = req.file ? `${req.file.filename}` : null;
 
         // Membuat user baru
         const newUser = await User.create({

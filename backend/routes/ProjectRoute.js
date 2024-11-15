@@ -40,17 +40,17 @@ const ProjectController = require('../controllers/ProjectController');
  *                 type: string
  *                 example: Jl langka, dusun baru Keramik merah
  *               provinsi:
- *                 type: integer
- *                 example: 001
+ *                 type: string
+ *                 example: Jawa Timur
  *               kabupaten_kota:
- *                 type: integer
- *                 example: 001
+ *                 type: string
+ *                 example: Tulungagung
  *               kecamatan:
- *                 type: integer
- *                 example: 001
+ *                 type: string
+ *                 example: Tulungagung
  *               kelurahan_desa:
- *                 type: integer
- *                 example: 001
+ *                 type: string
+ *                 example: Pakel
  *     responses:
  *       201:
  *         description: Project created successfully
@@ -118,32 +118,40 @@ router.get('/:id', ProjectController.getProjectById);
  *             properties:
  *               nama_project:
  *                 type: string
+ *                 example: Persiapan Bangun PT Indomaret
  *               kategori:
  *                 type: string
+ *                 example: Persiapan Bangun
  *               deskripsi:
  *                 type: string
+ *                 example: Penjelasan deskripsi proyek singkat
  *               nama_pengaju_project:
  *                 type: string
+ *                 example: Nurmaningtiyas
  *               jabatan:
  *                 type: string
+ *                 example: Manager
  *               instansi_organisasi:
  *                 type: string
+ *                 example: PT Indomaret
  *               no_telp:
  *                 type: string
+ *                 example: 89230493210
  *               alamat_lengkap:
  *                 type: string
+ *                 example: Jl langka, dusun baru Keramik merah
  *               provinsi:
- *                 type: integer
- *                 example: 001
+ *                 type: string
+ *                 example: Jawa Timur
  *               kabupaten_kota:
- *                 type: integer
- *                 example: 001
+ *                 type: string
+ *                 example: Tulungagung
  *               kecamatan:
- *                 type: integer
- *                 example: 001
+ *                 type: string
+ *                 example: Tulungagung
  *               kelurahan_desa:
- *                 type: integer
- *                 example: 001
+ *                 type: string
+ *                 example: Pakel
  *     responses:
  *       200:
  *         description: Project updated successfully

@@ -3,6 +3,8 @@ const Project = require('../models/Project'); // Pastikan path ini benar
 const upload = require('../middleware/uploadFile'); // Middleware for file upload
 const fs = require('fs');
 const path = require('path');
+const { sequelize } = require('../models');
+const moment = require('moment-timezone');
 
 // Helper to format file paths
 const formatFilePath = (file) => `${file.filename}`;
@@ -35,29 +37,81 @@ exports.createDetailProjectPendukung = async (req, res) => {
 };
 
 
-// Get all DetailProjectPendukung entries
+// Get all DetailProjectPendukung entries with custom SQL query
 exports.getAllDetailProjectPendukung = async (req, res) => {
   try {
-    const detailProjectPendukungs = await DetailProjectPendukung.findAll();
+    const [detailProjectPendukungs, metadata] = await sequelize.query(`SELECT 
+      projects.id_project AS ID,
+      JSON_ARRAYAGG(
+        JSON_OBJECT(
+          'file', detailprojectpendukungs.other_file,
+          'format', CASE 
+                        WHEN detailprojectpendukungs.other_file LIKE '%.pdf' THEN 'pdf' 
+                        WHEN detailprojectpendukungs.other_file LIKE '%.docx' THEN 'docx' 
+                        ELSE 'unknown' 
+                    END
+        )
+      ) AS filePendukung
+    FROM 
+      projects
+    LEFT JOIN 
+      detailprojectpendukungs ON detailprojectpendukungs.id_project = projects.id_project
+    WHERE 
+      projects.deletedAt IS NULL
+    GROUP BY 
+      projects.id_project
+    ORDER BY 
+      projects.id_project;`);
+
+    // Return the result as a JSON response without Date and Aktivitas formatting
     res.status(200).json(detailProjectPendukungs);
   } catch (error) {
-    res.status(400).json({ error: error.message });
+    console.error("Error fetching DetailProjectPendukung:", error);
+    res.status(500).json({ message: 'Error fetching DetailProjectPendukung', error: error.message });
   }
 };
 
-// Get DetailProjectPendukung by ID
+// Get a single DetailProjectPendukung entry by id_project (from projects table)
 exports.getDetailProjectPendukungById = async (req, res) => {
+  const { id } = req.params; // Getting the id from request params
   try {
-    const detailProjectPendukung = await DetailProjectPendukung.findByPk(req.params.id, {
-      include: [{ model: Project, attributes: ['name'] }],
+    const [detailProjectPendukung, metadata] = await sequelize.query(`
+      SELECT 
+      projects.id_project AS ID,
+      JSON_ARRAYAGG(
+        JSON_OBJECT(
+          'file', detailprojectpendukungs.other_file,
+          'format', CASE 
+                        WHEN detailprojectpendukungs.other_file LIKE '%.pdf' THEN 'pdf' 
+                        WHEN detailprojectpendukungs.other_file LIKE '%.docx' THEN 'docx' 
+                        ELSE 'unknown' 
+                    END
+        )
+      ) AS filePendukung
+    FROM 
+      projects
+    LEFT JOIN 
+      detailprojectpendukungs ON detailprojectpendukungs.id_project = projects.id_project
+    WHERE 
+      projects.deletedAt IS NULL
+      AND projects.id_project = :id_project
+    GROUP BY 
+      projects.id_project
+    ORDER BY 
+      projects.id_project;
+    `, {
+      replacements: { id_project: id },
     });
-    if (detailProjectPendukung) {
-      res.status(200).json(detailProjectPendukung);
-    } else {
-      res.status(404).json({ error: 'DetailProjectPendukung not found' });
+
+    if (detailProjectPendukung.length === 0) {
+      return res.status(404).json({ message: 'Project not found' });
     }
+
+    // Return the result as a JSON response without Date and Aktivitas formatting
+    res.status(200).json(detailProjectPendukung);
   } catch (error) {
-    res.status(400).json({ error: error.message });
+    console.error("Error fetching DetailProjectPendukung:", error);
+    res.status(500).json({ message: 'Error fetching DetailProjectPendukung', error: error.message });
   }
 };
 
@@ -107,7 +161,7 @@ exports.updateDetailProjectPendukung = async (req, res) => {
 
 exports.deleteDetailProjectPendukung = async (req, res) => {
   try {
-    // Find the detail project entry by id_project_utama
+    // Find the detail project entry by id_project_pendukung
     const detail = await DetailProjectPendukung.findOne({
       where: { id_project_pendukung: req.params.id }
     });

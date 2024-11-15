@@ -3,6 +3,8 @@ const Project = require('../models/Project'); // Pastikan path ini benar
 const upload = require('../middleware/uploadFile'); // Middleware for file upload
 const fs = require('fs');
 const path = require('path');
+const { sequelize } = require('../models');
+const moment = require('moment-timezone');
 
 
 // Helper to format file paths
@@ -106,29 +108,81 @@ exports.createDetailProjectUtama = async (req, res) => {
 
 // Get all DetailProjectUtama entries
 exports.getAllDetailProjectUtama = async (req, res) => {
-  try {
-    const detailProjectUtamas = await DetailProjectUtama.findAll();
-    res.status(200).json(detailProjectUtamas);
-  } catch (error) {
-    res.status(400).json({ error: error.message });
-  }
-};
+    try {
+      const [detailProjectUtamas, metadata] = await sequelize.query(`SELECT 
+        projects.id_project AS ID,
+        JSON_ARRAYAGG(
+          JSON_OBJECT(
+            'file', detailprojectutamas.other_file,
+            'format', CASE 
+                          WHEN detailprojectutamas.other_file LIKE '%.pdf' THEN 'pdf' 
+                          WHEN detailprojectutamas.other_file LIKE '%.docx' THEN 'docx' 
+                          ELSE 'unknown' 
+                      END
+          )
+        ) AS fileUtama
+      FROM 
+        projects
+      LEFT JOIN 
+        detailprojectutamas ON detailprojectutamas.id_project = projects.id_project
+      WHERE 
+        projects.deletedAt IS NULL
+      GROUP BY 
+        projects.id_project
+      ORDER BY 
+        projects.id_project;`);
+  
+      // Return the result as a JSON response without Date and Aktivitas formatting
+      res.status(200).json(detailProjectUtamas);
+    } catch (error) {
+      console.error("Error fetching DetailProjectUtama:", error);
+      res.status(500).json({ message: 'Error fetching DetailProjectUtama', error: error.message });
+    }
+  };
 
 // Get DetailProjectUtama by ID
 exports.getDetailProjectUtamaById = async (req, res) => {
-  try {
-    const detailProjectUtama = await DetailProjectUtama.findByPk(req.params.id, {
-      include: [{ model: Project, attributes: ['name'] }],
-    });
-    if (detailProjectUtama) {
+    const { id } = req.params; // Getting the id from request params
+    try {
+      const [detailProjectUtama, metadata] = await sequelize.query(`
+        SELECT 
+        projects.id_project AS ID,
+        JSON_ARRAYAGG(
+          JSON_OBJECT(
+            'file', detailprojectutamas.other_file,
+            'format', CASE 
+                          WHEN detailprojectutamas.other_file LIKE '%.pdf' THEN 'pdf' 
+                          WHEN detailprojectutamas.other_file LIKE '%.docx' THEN 'docx' 
+                          ELSE 'unknown' 
+                      END
+          )
+        ) AS fileUtama
+      FROM 
+        projects
+      LEFT JOIN 
+        detailprojectutamas ON detailprojectutamas.id_project = projects.id_project
+      WHERE 
+        projects.deletedAt IS NULL
+        AND projects.id_project = :id_project
+      GROUP BY 
+        projects.id_project
+      ORDER BY 
+        projects.id_project;
+      `, {
+        replacements: { id_project: id },
+      });
+  
+      if (detailProjectUtama.length === 0) {
+        return res.status(404).json({ message: 'Project not found' });
+      }
+  
+      // Return the result as a JSON response without Date and Aktivitas formatting
       res.status(200).json(detailProjectUtama);
-    } else {
-      res.status(404).json({ error: 'DetailProjectUtama not found' });
+    } catch (error) {
+      console.error("Error fetching DetailProjectUtama:", error);
+      res.status(500).json({ message: 'Error fetching DetailProjectUtama', error: error.message });
     }
-  } catch (error) {
-    res.status(400).json({ error: error.message });
-  }
-};
+  };
 
 exports.updateDetailProjectUtama = async (req, res) => {
     try {

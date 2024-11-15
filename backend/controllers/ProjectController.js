@@ -40,6 +40,7 @@ class ProjectController {
                     detailprojectutamas ON detailprojectutamas.id_project = projects.id_project
                 WHERE 
                     projects.deletedAt IS NULL
+                    AND projects.archive = 'Aktif'
                 GROUP BY 
                     projects.id_project,
                     projects.nama_project,
@@ -77,8 +78,9 @@ class ProjectController {
     
 
     static async getProjectById(req, res) {
-        const { id } = req.params;
+        const { id } = req.params;  // Get id from the URL params
         try {
+            // Adjust the query to filter based on projects.id_project
             const [project, metadata] = await sequelize.query(`
                 SELECT 
                     projects.id_project AS ID,
@@ -104,6 +106,8 @@ class ProjectController {
                     detailprojectutamas ON detailprojectutamas.id_project = projects.id_project
                 WHERE 
                     projects.deletedAt IS NULL
+                    AND projects.id_project = :id_project  -- Filter by the provided id
+                    AND projects.archive = 'Aktif'
                 GROUP BY 
                     projects.id_project,
                     projects.nama_project,
@@ -124,7 +128,7 @@ class ProjectController {
                 ORDER BY 
                     projects.id_project;
             `, {
-                replacements: { id: id },
+                replacements: { id_project: id },  // Pass the id from params here
             });
     
             if (project.length === 0) {
@@ -134,17 +138,17 @@ class ProjectController {
             // Format tanggal menggunakan moment-timezone untuk zona waktu lokal
             const formattedProject = {
                 ...project[0],
-                Date: moment.utc(project[0].Date).tz('Asia/Jakarta').format('YYYY-MM-DD HH:mm:ss'), // Konversi ke zona waktu Asia/Jakarta
-                Aktivitas: moment.utc(project[0].Aktivitas).tz('Asia/Jakarta').format('YYYY-MM-DD HH:mm:ss'), // Konversi ke zona waktu Asia/Jakarta
+                Date: moment.utc(project[0].Date).tz('Asia/Jakarta').format('YYYY-MM-DD HH:mm:ss'),
+                Aktivitas: moment.utc(project[0].Aktivitas).tz('Asia/Jakarta').format('YYYY-MM-DD HH:mm:ss'),
             };
     
+            // Return the project data as a JSON response
             res.status(200).json(formattedProject);
         } catch (error) {
             console.error("Error fetching project by ID:", error);
             res.status(500).json({ message: 'Error fetching project by ID', error: error.message });
         }
     }
-    
 
     static async updateProject(req, res) {
         try {
