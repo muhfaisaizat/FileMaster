@@ -35,19 +35,19 @@ exports.createDetailProjectUtama = async (req, res) => {
 
         // Handle F1 and F2: Set custom names for the uploaded file
         if (req.body.pekerjaan === 'F1') {
-            customFileName = `${req.body.id_project}_Form Pendaftaran.pdf`;
+            customFileName = req.file.filename;
 
         } else if (req.body.pekerjaan === 'F2') {
-            customFileName = `${req.body.id_project}_Informasi Pekerjaan.pdf`;
+            customFileName = req.file.filename;
         }
 
         // Handle F3: Define allowed other files and set custom name
         if (req.body.pekerjaan === 'F3') {
             allowedOtherFiles = ['Form F3.pdf', 'Form F3.docx'];
             if (req.body.other_file === 'Form F3.pdf') {
-                customFileName = `${req.body.id_project}_Form F3.pdf`;
+                customFileName = req.file.filename;
             } else if (req.body.other_file === 'Form F3.docx') {
-                customFileName = `${req.body.id_project}_Form F3.docx`;
+                customFileName = req.file.filename;
             }
         } 
         // Handle F4: Define allowed other files and set custom name
@@ -58,26 +58,25 @@ exports.createDetailProjectUtama = async (req, res) => {
                 'Perhitungan Air Kotor.pdf', 'Kajian dan Simak (SLF).pdf'
             ];
             if (req.body.other_file === 'Gambar.pdf') {
-                customFileName = `${req.body.id_project}_Gambar.pdf`;
+                customFileName = req.file.filename;
             } else if (req.body.other_file === 'Analisa Struktur.pdf') {
-                customFileName = `${req.body.id_project}_Analisa Struktur.pdf`;
+                customFileName = req.file.filename;
             } else if (req.body.other_file === 'Spek Teknis.pdf') {
-                customFileName = `${req.body.id_project}_Spek Teknis.pdf`;
+                customFileName = req.file.filename;
             } else if (req.body.other_file === 'Perhitungan Air Hujan.pdf') {
-                customFileName = `${req.body.id_project}_Perhitungan Air Hujan.pdf`;
+                customFileName = req.file.filename;
             } else if (req.body.other_file === 'Perhitungan Air Bersih.pdf') {  
-                customFileName = `${req.body.id_project}_Perhitungan Air Bersih.pdf`;
+                customFileName = req.file.filename;
             } else if (req.body.other_file === 'Perhitungan Air Kotor.pdf') {
-                customFileName = `${req.body.id_project}_Perhitungan Air Kotor.pdf`;
+                customFileName = req.file.filename;
             } else if (req.body.other_file === 'Kajian dan Simak (SLF).pdf') {
-                customFileName = `${req.body.id_project}_Kajian dan Simak (SLF).pdf`;
+                customFileName = req.file.filename;
             }
         }
 
         // If pekerjaan is F1 or F2, other_file should be null or undefined
         if (req.body.pekerjaan === 'F1' || req.body.pekerjaan === 'F2') {
-            // Set other_file to null, but use the custom file name for F1 and F2
-            req.body.other_file = null;
+            customFileName = req.file.filename;
         }
 
         // If pekerjaan is F3 or F4, validate other_file value

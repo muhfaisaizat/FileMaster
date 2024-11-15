@@ -31,13 +31,12 @@ DetailProjectPendukung.init({
         allowNull: true,
     },
     other_file: {
-        type: DataTypes.ENUM('Form F3.pdf', 'Form F3.docx', 'Gambar.pdf', 'Analisa Struktur.pdf', 'Spek Teknis.pdf', 
-                             'Perhitungan Air Hujan.pdf', 'Perhitungan Air Bersih.pdf', 'Perhitungan Air Kotor.pdf', 'Kajian dan Simak (SLF).pdf'),
+        type: DataTypes.STRING,
         allowNull: true,
       },
     pekerjaan: {
-        type: DataTypes.ENUM('F1', 'F2', 'F3', 'F4'),
-        allowNull: false,
+        type: DataTypes.STRING,
+        allowNull: true,
     },
     createdAt: {
         type: DataTypes.DATE,

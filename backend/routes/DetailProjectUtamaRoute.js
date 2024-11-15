@@ -35,7 +35,7 @@ const gantifile = require('../middleware/gantiFile'); // Middleware for file upl
  *               other_file:
  *                 type: string
  *                 description: Additional file type based on pekerjaan
- *                 enum: ['Form F3.pdf', 'Form F3.docx', 'Gambar.pdf', 'Analisa Struktur.pdf', 'Spek Teknis.pdf', 'Perhitungan Air Hujan.pdf', 'Perhitungan Air Bersih.pdf', 'Perhitungan Air Kotor.pdf', 'Kajian dan Simak (SLF).pdf']
+ *                 enum: ['Form Pendaftaran.pdf','Informasi Pekerjaan.pdf','Form F3.pdf', 'Form F3.docx', 'Gambar.pdf', 'Analisa Struktur.pdf', 'Spek Teknis.pdf', 'Perhitungan Air Hujan.pdf', 'Perhitungan Air Bersih.pdf', 'Perhitungan Air Kotor.pdf', 'Kajian dan Simak (SLF).pdf']
  *               file:
  *                 type: string
  *                 format: binary

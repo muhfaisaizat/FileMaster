@@ -3,6 +3,7 @@ const express = require('express');
 const router = express.Router();
 const detailProjectPendukungController = require('../controllers/DetailProjectPendukungController');
 const upload = require('../middleware/uploadFile'); // Middleware for file upload
+const gantifile = require('../middleware/gantiFile'); 
 
 /**
  * @swagger
@@ -15,7 +16,7 @@ const upload = require('../middleware/uploadFile'); // Middleware for file uploa
  * @swagger
  * /api/detail-project-pendukung:
  *   post:
- *     summary: Create a new DetailProjectPendukung entry
+ *     summary: Create a new DetailProjectPendukung entry for a project
  *     tags: [DetailProjectPendukung]
  *     requestBody:
  *       required: true
@@ -27,23 +28,44 @@ const upload = require('../middleware/uploadFile'); // Middleware for file uploa
  *               id_project:
  *                 type: integer
  *                 description: The ID of the project
- *               pekerjaan:
- *                 type: string
- *                 enum: [F1, F2, F3, F4]
- *                 description: Type of pekerjaan
- *               other_file:
- *                 type: string
- *                 description: Additional file type based on pekerjaan
- *                 enum: ['Form F3.pdf', 'Form F3.docx', 'Gambar.pdf', 'Analisa Struktur.pdf', 'Spek Teknis.pdf', 'Perhitungan Air Hujan.pdf', 'Perhitungan Air Bersih.pdf', 'Perhitungan Air Kotor.pdf', 'Kajian dan Simak (SLF).pdf']
+ *                 example: 1
  *               file:
  *                 type: string
  *                 format: binary
- *                 description: The file for the detail project pendukung
+ *                 description: File to be uploaded
  *     responses:
  *       201:
  *         description: DetailProjectPendukung created successfully
- *       400:
- *         description: Invalid request
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: DetailProjectPendukung created successfully
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     id_project_pendukung:
+ *                       type: integer
+ *                       example: 1
+ *                     id_project:
+ *                       type: integer
+ *                       example: 1
+ *                     file:
+ *                       type: string
+ *                       example: uploaded-file.pdf
+ *                     other_file:
+ *                       type: string
+ *                       example: original-file.pdf
+ *                     pekerjaan:
+ *                       type: string
+ *                       example: file pendukung
+ *       404:
+ *         description: Project not found
+ *       500:
+ *         description: Internal server error
  */
 router.post('/', upload, detailProjectPendukungController.createDetailProjectPendukung);
 
@@ -104,31 +126,17 @@ router.get('/:id', detailProjectPendukungController.getDetailProjectPendukungByI
 
 /**
  * @swagger
- * /api/detail-project-pendukung/{id_project}:
+ * /api/detail-project-pendukung/{id}:
  *   put:
- *     summary: Update the file for a specific DetailProjectPendukung entry by project ID, other_file, and pekerjaan
+ *     summary: Update the file for a specific DetailProjectUtama entry by project ID, other_file, and pekerjaan
  *     tags: [DetailProjectPendukung]
  *     parameters:
  *       - in: path
- *         name: id_project
+ *         name: id
  *         required: true
- *         description: The ID of the project
  *         schema:
  *           type: integer
- *       - in: query
- *         name: pekerjaan
- *         required: true
- *         description: The type of pekerjaan (F1, F2, F3, F4)
- *         schema:
- *           type: string
- *           enum: [F1, F2, F3, F4]
- *       - in: query
- *         name: other_file
- *         required: true
- *         description: The additional file related to the project
- *         schema:
- *           type: string
- *           enum: ['Form F3.pdf', 'Form F3.docx', 'Gambar.pdf', 'Analisa Struktur.pdf', 'Spek Teknis.pdf', 'Perhitungan Air Hujan.pdf', 'Perhitungan Air Bersih.pdf', 'Perhitungan Air Kotor.pdf', 'Kajian dan Simak (SLF).pdf']
+ *         description: ID of the detail project pendukung
  *     requestBody:
  *       required: true
  *       content:
@@ -140,6 +148,9 @@ router.get('/:id', detailProjectPendukungController.getDetailProjectPendukungByI
  *                 type: string
  *                 format: binary
  *                 description: New file to update for the detail project pendukung
+ *               oldFileName:
+ *                 type: string
+ *                 description: The old file name (optional)
  *     responses:
  *       200:
  *         description: DetailProjectPendukung file updated successfully
@@ -148,7 +159,7 @@ router.get('/:id', detailProjectPendukungController.getDetailProjectPendukungByI
  *       400:
  *         description: Error updating DetailProjectPendukung
  */
-router.put('/:id', upload, detailProjectPendukungController.updateDetailProjectPendukung);
+router.put('/:id', gantifile, detailProjectPendukungController.updateDetailProjectPendukung);
 
 /**
  * @swagger

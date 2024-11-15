@@ -10,97 +10,28 @@ const formatFilePath = (file) => `${file.filename}`;
 // Create a new DetailProjectPendukung entry
 exports.createDetailProjectPendukung = async (req, res) => {
   try {
+    // Check if the related project exists
     const project = await Project.findByPk(req.body.id_project);
     if (!project) {
-      return res.status(404).json({ error: 'Project not found' });
+        return res.status(404).json({ error: 'Project not found' });
     }
 
-    // Check if a file already exists for this pekerjaan (for F1 and F2)
-    const existingFile = await DetailProjectPendukung.findOne({
-      where: {
+    // Create a new DetailProjectPendukung entry
+    const newDetailProjectPendukung = await DetailProjectPendukung.create({
         id_project: req.body.id_project,
-        pekerjaan: req.body.pekerjaan,
-      },
+        file: req.file.filename , // Assume multer is handling file upload
+        other_file: req.file.originalname ,
+        pekerjaan: 'file pendukung', // Default to 'file pendukung'
     });
 
-    // If pekerjaan is F1 or F2, deny if a file already exists
-    if ((req.body.pekerjaan === 'F1' || req.body.pekerjaan === 'F2') && existingFile) {
-      return res.status(400).json({ error: `${req.body.pekerjaan} file already exists` });
-    }
-
-    // Define allowed files and custom names for each pekerjaan
-    let allowedOtherFiles = [];
-    let customFileName = null;
-
-    // Handle F1 and F2: Set custom names for the uploaded file
-    if (req.body.pekerjaan === 'F1') {
-      customFileName = `${req.body.id_project}_Form Pendaftaran.pdf`;
-
-    } else if (req.body.pekerjaan === 'F2') {
-      customFileName = `${req.body.id_project}_Informasi Pekerjaan.pdf`;
-    }
-
-    // Handle F3: Define allowed other files and set custom name
-    if (req.body.pekerjaan === 'F3') {
-      allowedOtherFiles = ['Form F3.pdf', 'Form F3.docx'];
-      if (req.body.other_file === 'Form F3.pdf') {
-        customFileName = `${req.body.id_project}_Form F3.pdf`;
-      } else if (req.body.other_file === 'Form F3.docx') {
-        customFileName = `${req.body.id_project}_Form F3.docx`;
-      }
-    }
-    // Handle F4: Define allowed other files and set custom name
-    else if (req.body.pekerjaan === 'F4') {
-      allowedOtherFiles = [
-        'Gambar.pdf', 'Analisa Struktur.pdf', 'Spek Teknis.pdf',
-        'Perhitungan Air Hujan.pdf', 'Perhitungan Air Bersih.pdf',
-        'Perhitungan Air Kotor.pdf', 'Kajian dan Simak (SLF).pdf'
-      ];
-      if (req.body.other_file === 'Gambar.pdf') {
-        customFileName = `${req.body.id_project}_Gambar.pdf`;
-      } else if (req.body.other_file === 'Analisa Struktur.pdf') {
-        customFileName = `${req.body.id_project}_Analisa Struktur.pdf`;
-      } else if (req.body.other_file === 'Spek Teknis.pdf') {
-        customFileName = `${req.body.id_project}_Spek Teknis.pdf`;
-      } else if (req.body.other_file === 'Perhitungan Air Hujan.pdf') {
-        customFileName = `${req.body.id_project}_Perhitungan Air Hujan.pdf`;
-      } else if (req.body.other_file === 'Perhitungan Air Bersih.pdf') {
-        customFileName = `${req.body.id_project}_Perhitungan Air Bersih.pdf`;
-      } else if (req.body.other_file === 'Perhitungan Air Kotor.pdf') {
-        customFileName = `${req.body.id_project}_Perhitungan Air Kotor.pdf`;
-      } else if (req.body.other_file === 'Kajian dan Simak (SLF).pdf') {
-        customFileName = `${req.body.id_project}_Kajian dan Simak (SLF).pdf`;
-      }
-    }
-
-    // If pekerjaan is F1 or F2, other_file should be null or undefined
-    if (req.body.pekerjaan === 'F1' || req.body.pekerjaan === 'F2') {
-      // Set other_file to null, but use the custom file name for F1 and F2
-      req.body.other_file = null;
-    }
-
-    // If pekerjaan is F3 or F4, validate other_file value
-    if (allowedOtherFiles.length > 0 && !allowedOtherFiles.includes(req.body.other_file)) {
-      return res.status(400).json({ error: `Invalid other_file for pekerjaan ${req.body.pekerjaan}` });
-    }
-
-    // If no custom file name is found, use the original filename if available
-    if (!customFileName && req.file) {
-      customFileName = req.file.originalname;
-    }
-
-    // Save the entry in the database
-    const detailProjectPendukung = await DetailProjectPendukung.create({
-      id_project: req.body.id_project,
-      file: customFileName, // Use custom name based on pekerjaan (F1/F2) or other_file (F3/F4)
-      other_file: req.body.other_file, // Will be null for F1 and F2
-      pekerjaan: req.body.pekerjaan,
+    return res.status(201).json({
+        message: 'DetailProjectPendukung created successfully',
+        data: newDetailProjectPendukung,
     });
-
-    res.status(201).json(detailProjectPendukung);
-  } catch (error) {
-    res.status(400).json({ error: error.message });
-  }
+} catch (error) {
+    console.error('Error creating DetailProjectPendukung:', error);
+    return res.status(500).json({ error: 'Internal server error' });
+}
 };
 
 
@@ -132,115 +63,46 @@ exports.getDetailProjectPendukungById = async (req, res) => {
 
 exports.updateDetailProjectPendukung = async (req, res) => {
   try {
-    const { id } = req.params; // ID project dari URL
-    const { pekerjaan } = req.query; // pekerjaan dari query
-    let other_file = req.query.other_file; // nilai asli dari query other_file
-
-    // Validasi id_project
-    if (!id) {
-      return res.status(400).json({ error: 'id_project is required in the URL' });
-    }
-
-    // Validasi pekerjaan dan other_file
-    if (!pekerjaan || !other_file) {
-      return res.status(400).json({ error: 'pekerjaan and other_file are required in the query' });
-    }
-
-    // Jika pekerjaan adalah F1 atau F2, set other_file menjadi null
-    if (pekerjaan === 'F1' || pekerjaan === 'F2') {
-      other_file = null;
-    }
-
-    // Cari DetailProjectPendukung dengan kondisi khusus untuk pekerjaan F1 dan F2
-    const searchCriteria = {
-      id_project: id,
-      pekerjaan: pekerjaan,
-    };
-
-    // Tambahkan other_file ke criteria hanya jika pekerjaan bukan F1 atau F2
-    if (other_file !== null) {
-      searchCriteria.other_file = other_file;
-    }
-
-    const detailProjectPendukung = await DetailProjectPendukung.findOne({
-      where: searchCriteria,
+    const projectId = req.params.id;
+    const detail = await DetailProjectPendukung.findOne({
+        where: { id_project_pendukung: projectId }
     });
 
-    if (!detailProjectPendukung) {
-      return res.status(404).json({ error: 'DetailProjectPendukung not found' });
+    if (!detail) {
+        return res.status(404).json({ message: 'Detail project pendukung not found' });
     }
 
-    // Tentukan customFileName sesuai dengan logika create, tanpa mengubah nama file yang sudah ada
-    let customFileName;
-    if (pekerjaan === 'F1') {
-      customFileName = `${id}_Form Pendaftaran.pdf`;
-    } else if (pekerjaan === 'F2') {
-      customFileName = `${id}_Informasi Pekerjaan.pdf`;
-    } else if (pekerjaan === 'F3') {
-      if (other_file === 'Form F3.pdf') {
-        customFileName = `${id}_Form F3.pdf`;
-      } else if (other_file === 'Form F3.docx') {
-        customFileName = `${id}_Form F3.docx`;
-      }
-    } else if (pekerjaan === 'F4') {
-      if (other_file === 'Gambar.pdf') {
-        customFileName = `${id}_Gambar.pdf`;
-      } else if (other_file === 'Analisa Struktur.pdf') {
-        customFileName = `${id}_Analisa Struktur.pdf`;
-      } else if (other_file === 'Spek Teknis.pdf') {
-        customFileName = `${id}_Spek Teknis.pdf`;
-      } else if (other_file === 'Perhitungan Air Hujan.pdf') {
-        customFileName = `${id}_Perhitungan Air Hujan.pdf`;
-      } else if (other_file === 'Perhitungan Air Bersih.pdf') {
-        customFileName = `${id}_Perhitungan Air Bersih.pdf`;
-      } else if (other_file === 'Perhitungan Air Kotor.pdf') {
-        customFileName = `${id}_Perhitungan Air Kotor.pdf`;
-      } else if (other_file === 'Kajian dan Simak (SLF).pdf') {
-        customFileName = `${id}_Kajian dan Simak (SLF).pdf`;
-      }
-    }
+    const oldFileName = req.body.oldFileName || detail.file; // Nama file lama, jika ada
+    const newFile = req.file; // File baru yang di-upload
 
-    // Simpan file yang diupload (jika ada) ke dalam folder uploads dengan nama sesuai `customFileName`
-    if (req.file) {
-      const fs = require('fs');
-      const path = require('path');
+    if (newFile) {
+        // Hapus file lama
+        const oldFilePath = path.join(__dirname, '..', 'uploads', oldFileName);
+        fs.unlink(oldFilePath, (err) => {
+            if (err) {
+                console.error("Error deleting old file:", err);
+                return res.status(500).json({ message: 'Error deleting old file', error: err.message });
+            }
+            console.log('Old file deleted successfully');
+        });
 
-      // Path lengkap ke file yang diupload
-      const uploadPath = path.join(__dirname, '../uploads', customFileName);
+        // Update file baru dan simpan perubahan di database
+        detail.file = newFile.filename;
+        detail.other_file = newFile.originalname;
+        detail.updatedAt = new Date();
+        await detail.save();
 
-      // Hapus file lama jika ada dan digantikan
-      if (fs.existsSync(uploadPath)) {
-        fs.unlinkSync(uploadPath);
-      }
-
-      // Pindahkan file baru dengan nama customFileName
-      fs.renameSync(req.file.path, uploadPath);
-
-      // Update data pada database
-      await detailProjectPendukung.update({
-        file: customFileName,
-        other_file: other_file
-      });
+        res.status(200).json({ message: 'Detail project pendukung updated successfully', detail });
     } else {
-      // Update hanya `other_file` jika tidak ada file baru yang diupload
-      await detailProjectPendukung.update({
-        other_file: other_file
-      });
+        // Jika tidak ada file baru, hanya update timestamp
+        detail.updatedAt = new Date();
+        await detail.save();
+        res.status(200).json({ message: 'Detail project pendukung updated (no file change)', detail });
     }
-
-    res.status(200).json({
-      id_project_pendukung: detailProjectPendukung.id_project_pendukung,
-      id_project: detailProjectPendukung.id_project,
-      file: detailProjectPendukung.file,
-      other_file: detailProjectPendukung.other_file,
-      pekerjaan: detailProjectPendukung.pekerjaan,
-      createdAt: detailProjectPendukung.createdAt,
-      updatedAt: detailProjectPendukung.updatedAt,
-      deletedAt: detailProjectPendukung.deletedAt,
-    });
-  } catch (error) {
-    res.status(400).json({ error: error.message });
-  }
+} catch (error) {
+    console.error("Error:", error);
+    res.status(500).json({ message: 'Error updating detail project pendukung', error: error.message });
+}
 };
 
 exports.deleteDetailProjectPendukung = async (req, res) => {

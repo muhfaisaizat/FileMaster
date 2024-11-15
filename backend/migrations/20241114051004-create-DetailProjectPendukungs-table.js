@@ -24,13 +24,12 @@ module.exports = {
         allowNull: true,
       },
       other_file: {
-        type: Sequelize.ENUM('Form F3.pdf', 'Form F3.docx', 'Gambar.pdf', 'Analisa Struktur.pdf', 'Spek Teknis.pdf', 
-                             'Perhitungan Air Hujan.pdf', 'Perhitungan Air Bersih.pdf', 'Perhitungan Air Kotor.pdf', 'Kajian dan Simak (SLF).pdf'),
+        type: Sequelize.STRING,
         allowNull: true,
       },
       pekerjaan: {
-        type: Sequelize.ENUM('F1', 'F2', 'F3', 'F4'),
-        allowNull: false,
+        type: Sequelize.STRING,
+        allowNull: true,
       },
       createdAt: {
         type: Sequelize.DATE,
