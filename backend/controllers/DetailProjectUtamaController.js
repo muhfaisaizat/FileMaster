@@ -109,31 +109,13 @@ exports.createDetailProjectUtama = async (req, res) => {
 // Get all DetailProjectUtama entries
 exports.getAllDetailProjectUtama = async (req, res) => {
     try {
-      const [detailProjectUtamas, metadata] = await sequelize.query(`SELECT 
-        projects.id_project AS ID,
-        JSON_ARRAYAGG(
-          JSON_OBJECT(
-            'file', detailprojectutamas.other_file,
-            'format', CASE 
-                          WHEN detailprojectutamas.other_file LIKE '%.pdf' THEN 'pdf' 
-                          WHEN detailprojectutamas.other_file LIKE '%.docx' THEN 'docx' 
-                          ELSE 'unknown' 
-                      END
-          )
-        ) AS fileUtama
-      FROM 
-        projects
-      LEFT JOIN 
-        detailprojectutamas ON detailprojectutamas.id_project = projects.id_project
-      WHERE 
-        projects.deletedAt IS NULL
-      GROUP BY 
-        projects.id_project
-      ORDER BY 
-        projects.id_project;`);
-  
+        const detailProjects = await DetailProjectUtama.findAll({
+            where: {
+                deletedAt: null
+            }
+        });
       // Return the result as a JSON response without Date and Aktivitas formatting
-      res.status(200).json(detailProjectUtamas);
+      res.status(200).json(detailProjects);
     } catch (error) {
       console.error("Error fetching DetailProjectUtama:", error);
       res.status(500).json({ message: 'Error fetching DetailProjectUtama', error: error.message });
@@ -144,40 +126,31 @@ exports.getAllDetailProjectUtama = async (req, res) => {
 exports.getDetailProjectUtamaById = async (req, res) => {
     const { id } = req.params; // Getting the id from request params
     try {
-      const [detailProjectUtama, metadata] = await sequelize.query(`
-        SELECT 
-        projects.id_project AS ID,
-        JSON_ARRAYAGG(
-          JSON_OBJECT(
-            'file', detailprojectutamas.other_file,
-            'format', CASE 
-                          WHEN detailprojectutamas.other_file LIKE '%.pdf' THEN 'pdf' 
-                          WHEN detailprojectutamas.other_file LIKE '%.docx' THEN 'docx' 
-                          ELSE 'unknown' 
-                      END
-          )
-        ) AS fileUtama
-      FROM 
-        projects
-      LEFT JOIN 
-        detailprojectutamas ON detailprojectutamas.id_project = projects.id_project
-      WHERE 
-        projects.deletedAt IS NULL
-        AND projects.id_project = :id_project
-      GROUP BY 
-        projects.id_project
-      ORDER BY 
-        projects.id_project;
-      `, {
-        replacements: { id_project: id },
-      });
+        const detailProjects = await DetailProjectUtama.findAll({
+            where: {
+                deletedAt: null,
+                id_project: id // Include the condition to match the specific id_project
+            },
+            attributes: {
+                include: [
+                    [
+                        sequelize.literal(`CASE 
+                            WHEN file LIKE '%.pdf' THEN 'pdf' 
+                            WHEN file LIKE '%.docx' THEN 'docx' 
+                            ELSE 'UNKNOWN' 
+                        END`),
+                        'format'
+                    ]
+                ]
+            }
+        });
   
-      if (detailProjectUtama.length === 0) {
+      if (detailProjects.length === 0) {
         return res.status(404).json({ message: 'Project not found' });
       }
   
       // Return the result as a JSON response without Date and Aktivitas formatting
-      res.status(200).json(detailProjectUtama);
+      res.status(200).json(detailProjects);
     } catch (error) {
       console.error("Error fetching DetailProjectUtama:", error);
       res.status(500).json({ message: 'Error fetching DetailProjectUtama', error: error.message });

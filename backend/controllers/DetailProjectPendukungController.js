@@ -40,31 +40,13 @@ exports.createDetailProjectPendukung = async (req, res) => {
 // Get all DetailProjectPendukung entries with custom SQL query
 exports.getAllDetailProjectPendukung = async (req, res) => {
   try {
-    const [detailProjectPendukungs, metadata] = await sequelize.query(`SELECT 
-      projects.id_project AS ID,
-      JSON_ARRAYAGG(
-        JSON_OBJECT(
-          'file', detailprojectpendukungs.other_file,
-          'format', CASE 
-                        WHEN detailprojectpendukungs.other_file LIKE '%.pdf' THEN 'pdf' 
-                        WHEN detailprojectpendukungs.other_file LIKE '%.docx' THEN 'docx' 
-                        ELSE 'unknown' 
-                    END
-        )
-      ) AS filePendukung
-    FROM 
-      projects
-    LEFT JOIN 
-      detailprojectpendukungs ON detailprojectpendukungs.id_project = projects.id_project
-    WHERE 
-      projects.deletedAt IS NULL
-    GROUP BY 
-      projects.id_project
-    ORDER BY 
-      projects.id_project;`);
-
-    // Return the result as a JSON response without Date and Aktivitas formatting
-    res.status(200).json(detailProjectPendukungs);
+    const detailProjects = await DetailProjectPendukung.findAll({
+      where: {
+          deletedAt: null
+      }
+  });
+// Return the result as a JSON response without Date and Aktivitas formatting
+res.status(200).json(detailProjects);
   } catch (error) {
     console.error("Error fetching DetailProjectPendukung:", error);
     res.status(500).json({ message: 'Error fetching DetailProjectPendukung', error: error.message });
@@ -75,40 +57,20 @@ exports.getAllDetailProjectPendukung = async (req, res) => {
 exports.getDetailProjectPendukungById = async (req, res) => {
   const { id } = req.params; // Getting the id from request params
   try {
-    const [detailProjectPendukung, metadata] = await sequelize.query(`
-      SELECT 
-      projects.id_project AS ID,
-      JSON_ARRAYAGG(
-        JSON_OBJECT(
-          'file', detailprojectpendukungs.other_file,
-          'format', CASE 
-                        WHEN detailprojectpendukungs.other_file LIKE '%.pdf' THEN 'pdf' 
-                        WHEN detailprojectpendukungs.other_file LIKE '%.docx' THEN 'docx' 
-                        ELSE 'unknown' 
-                    END
-        )
-      ) AS filePendukung
-    FROM 
-      projects
-    LEFT JOIN 
-      detailprojectpendukungs ON detailprojectpendukungs.id_project = projects.id_project
-    WHERE 
-      projects.deletedAt IS NULL
-      AND projects.id_project = :id_project
-    GROUP BY 
-      projects.id_project
-    ORDER BY 
-      projects.id_project;
-    `, {
-      replacements: { id_project: id },
-    });
+    const detailProjects = await DetailProjectPendukung.findAll({
+      where: {
+          deletedAt: null,
+          id_project: id
+      }
+  });
 
-    if (detailProjectPendukung.length === 0) {
+
+    if (detailProjects.length === 0) {
       return res.status(404).json({ message: 'Project not found' });
     }
 
     // Return the result as a JSON response without Date and Aktivitas formatting
-    res.status(200).json(detailProjectPendukung);
+    res.status(200).json(detailProjects);
   } catch (error) {
     console.error("Error fetching DetailProjectPendukung:", error);
     res.status(500).json({ message: 'Error fetching DetailProjectPendukung', error: error.message });
