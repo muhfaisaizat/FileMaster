@@ -12,8 +12,51 @@ import {
 } from "@/components/ui/dialog"
 import { Export, DocumentForward, Trash, DocumentText, DocumentUpload } from 'iconsax-react';
 import { X } from "lucide-react";
+import { API_URL } from "../../../../helpers/networt";
+import axios from 'axios';
 
-const HapusFile = ({ setUploadedFile }) => {
+const HapusFile = ({ UploadedFile, setUploadedFile, DataFileUtama,  setDataFileUtama, fetchDataLOG, fetchDataUtama }) => {
+    const handleDelete = async () => {
+        const token = localStorage.getItem("token");
+        const id = localStorage.getItem("id_project");
+        const iduser = localStorage.getItem("id");
+
+        try {
+            // Mengirimkan permintaan DELETE ke API
+            await axios.delete(`${API_URL}/api/detail-project-utama/${UploadedFile[0].id_project_utama}`, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+
+            await axios.post(`${API_URL}/api/log-aktivitas`, {
+                id_project: id,
+                id_user: iduser,
+                aktivitas: "menghapus file",
+                keterangan: UploadedFile[0].other_file
+            }, {
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                }
+            });
+
+
+
+            const updatedFiles = DataFileUtama.filter(file => file.id !== UploadedFile[0].id_project_utama);
+            setDataFileUtama(updatedFiles);
+            fetchDataUtama();
+            fetchDataLOG();
+
+
+        } catch (error) {
+            console.error("Gagal menghapus pengguna:", error);
+
+
+        }
+
+        setUploadedFile(null)
+    };
     return (
         <Dialog>
             <DialogTrigger asChild>
@@ -44,7 +87,7 @@ const HapusFile = ({ setUploadedFile }) => {
                             Batal
                         </Button>
                     </DialogClose>
-                    <Button onClick={() => setUploadedFile(null)} className='bg-[#EF4343] text-[14px] hover:bg-[#EF4343] h-[40px]'>Hapus</Button>
+                    <Button onClick={() => handleDelete()} className='bg-[#EF4343] text-[14px] hover:bg-[#EF4343] h-[40px]'>Hapus</Button>
                 </DialogFooter>
             </DialogContent>
         </Dialog>

@@ -126,6 +126,59 @@ const ProjectDetail = () => {
     fetchDataLOG();
   }, []);
 
+
+   const [DataFileUtama, setDataFileUtama] = useState([])
+
+
+  const formatDataUtama = (apiData) => {
+    return {
+      id: apiData.id_project_utama, 
+      id_project: apiData.id_project,
+      file: apiData.other_file, 
+      isi: apiData.file, 
+      pekerjaan: apiData.pekerjaan,
+      format: apiData.format
+    };
+  };
+
+const fetchDataUtama = async () => {
+    const token = localStorage.getItem("token");
+    const id = localStorage.getItem("id_project");
+    try {
+        const response = await axios.get(`${API_URL}/api/detail-project-utama/${id}`, {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        });
+
+       // Log untuk memastikan data yang diterima
+
+        // Pastikan response.data adalah array
+        if (Array.isArray(response.data)) {
+          const filteredData = response.data.filter(item => item.pekerjaan === "F1");
+          // console.log(filteredData)
+            const formattedData = response.data.map(formatDataUtama);
+            setDataFileUtama(formattedData);
+            if (filteredData.length > 0) {
+              setUploadedFile(filteredData);
+          } else{
+            setUploadedFile(null);
+          }
+        } else {
+            console.error("Data yang diterima bukan array");
+        }
+    } catch (error) {
+        console.error("Error fetching data", error);
+    }
+};
+// Ambil data dari API
+useEffect(() => {
+
+    fetchDataUtama();
+}, []);
+
+
+
   
 
 
@@ -150,6 +203,10 @@ const ProjectDetail = () => {
               Data={Data}
               activities={activities}
               fetchDataLOG={fetchDataLOG}
+              DataFileUtama={DataFileUtama}
+              setDataFileUtama={setDataFileUtama}
+              fetchDataUtama={fetchDataUtama}
+              setUploadedFile={setUploadedFile}
             />
           </div>
           <div className={`${isFolderVisible ? 'lg:w-[24%]' : 'lg:w-[28%]'
@@ -177,6 +234,10 @@ const ProjectDetail = () => {
               setUploadedFileF4airkotor={setUploadedFileF4airkotor}
               uploadedFileF4SLF={uploadedFileF4SLF}
               setUploadedFileF4SLF={setUploadedFileF4SLF}
+              fetchDataLOG={fetchDataLOG}
+              fetchDataUtama={fetchDataUtama}
+              DataFileUtama={DataFileUtama}
+              setDataFileUtama={setDataFileUtama}
             />
           </div>
         </div>

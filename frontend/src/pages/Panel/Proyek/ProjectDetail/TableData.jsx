@@ -9,7 +9,7 @@ import FilePendukung from './FilePendukung';
 import InformasiProyek from './InformasiProyek';
 import LogActivity from './LogActivity';
 
-const TableData = ({uploadedFile, uploadedFileF2, uploadedFileF3, uploadedFileF4, lengF, Data, activities, fetchDataLOG}) => {
+const TableData = ({uploadedFile, uploadedFileF2, uploadedFileF3, uploadedFileF4, lengF, Data, activities, fetchDataLOG, DataFileUtama , setDataFileUtama, fetchDataUtama, setUploadedFile}) => {
     const [activeTab, setActiveTab] = useState("Direktori");
     const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
 
@@ -136,7 +136,7 @@ const TableData = ({uploadedFile, uploadedFileF2, uploadedFileF3, uploadedFileF4
 
                     <div>
                         {activeTab === "Direktori" && (
-                           <FileUtama fetchDataLOG={fetchDataLOG}/>
+                           <FileUtama fetchDataLOG={fetchDataLOG} DataFileUtama={DataFileUtama} setDataFileUtama={setDataFileUtama} fetchDataUtama={fetchDataUtama} setUploadedFile={setUploadedFile}/>
                         )}
                         {activeTab === " Log" && (
                             <LogActivity activities={activities}/>

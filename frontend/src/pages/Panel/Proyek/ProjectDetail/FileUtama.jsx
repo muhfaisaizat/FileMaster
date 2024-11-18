@@ -31,58 +31,19 @@ import { API_URL } from "../../../../helpers/networt";
 import axios from 'axios';
 
 
-const FileUtama = ({fetchDataLOG}) => {
+const FileUtama = ({fetchDataLOG , DataFileUtama, setDataFileUtama, fetchDataUtama, setUploadedFile}) => {
     const [isDialogOpen, setDialogOpen] = useState(false);
     const DataRole = [
         { id: "m5gr84i9", name: 'pdf' },
         { id: "m5gr84i7", name: 'docx' },
     ];
-    const [DataFileUtama, setDataFileUtama] = useState([
-        // { id: 1, file: 'Form Prndaftaran.pdf' , format:'pdf'},
-        // { id: 2, file: 'F3.docx', format:'docx' },
-        // { id: 3, file: 'Informasi Pekerjaan.docx', format:'docx' },
-    ])
+    // const [DataFileUtama, setDataFileUtama] = useState([
+    //     // { id: 1, file: 'Form Prndaftaran.pdf' , format:'pdf'},
+    //     // { id: 2, file: 'F3.docx', format:'docx' },
+    //     // { id: 3, file: 'Informasi Pekerjaan.docx', format:'docx' },
+    // ])
 
-    const formatData = (apiData) => {
-        return {
-          id: apiData.id_project_utama, 
-          id_project: apiData.id_project,
-          file: apiData.other_file, 
-          isi: apiData.file, 
-          pekerjaan: apiData.pekerjaan,
-          format: apiData.format
-        };
-      };
-
-    const fetchData = async () => {
-        const token = localStorage.getItem("token");
-        const id = localStorage.getItem("id_project");
-        try {
-            const response = await axios.get(`${API_URL}/api/detail-project-utama/${id}`, {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                },
-            });
-
-           // Log untuk memastikan data yang diterima
-
-            // Pastikan response.data adalah array
-            if (Array.isArray(response.data)) {
-                const formattedData = response.data.map(formatData);
-               
-                setDataFileUtama(formattedData);
-            } else {
-                console.error("Data yang diterima bukan array");
-            }
-        } catch (error) {
-            console.error("Error fetching data", error);
-        }
-    };
-    // Ambil data dari API
-    useEffect(() => {
     
-        fetchData();
-    }, []);
     const [selectedFileId, setSelectedFileId] = useState(null);
     const [selectedFilename, setSelectedFilename] = useState(null);
 
@@ -128,6 +89,8 @@ const FileUtama = ({fetchDataLOG}) => {
     
             const updatedFiles = DataFileUtama.filter(file => file.id !== selectedFileId);
             setDataFileUtama(updatedFiles);
+            fetchDataUtama();
+            setUploadedFile(null);
             fetchDataLOG();
     
             

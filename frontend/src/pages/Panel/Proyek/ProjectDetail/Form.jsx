@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import {
     Accordion,
     AccordionContent,
@@ -11,15 +11,77 @@ import Pdf from '../../../../assets/pdf.png'
 import Docx from '../../../../assets/docx.png'
 import HapusFile from './HapusFile';
 import EditFile from './EditFile';
+import { API_URL } from "../../../../helpers/networt";
+import axios from 'axios';
 
-const Form = ({ uploadedFile, setUploadedFile, uploadedFileF2, setUploadedFileF2, uploadedFileF3pdf, setUploadedFileF3pdf, uploadedFileF3docx, setUploadedFileF3docx, uploadedFileF4gambar, setUploadedFileF4gambar, uploadedFileF4analisa, setUploadedFileF4analisa, uploadedFileF4spek, setUploadedFileF4spek, uploadedFileF4airhujan, setUploadedFileF4airhujan, uploadedFileF4airbersih, setUploadedFileF4airbersih, uploadedFileF4airkotor, setUploadedFileF4airkotor, uploadedFileF4SLF, setUploadedFileF4SLF }) => {
+const Form = ({ uploadedFile, setUploadedFile, uploadedFileF2, setUploadedFileF2, uploadedFileF3pdf, setUploadedFileF3pdf, uploadedFileF3docx, setUploadedFileF3docx, uploadedFileF4gambar, setUploadedFileF4gambar, uploadedFileF4analisa, setUploadedFileF4analisa, uploadedFileF4spek, setUploadedFileF4spek, uploadedFileF4airhujan, setUploadedFileF4airhujan, uploadedFileF4airbersih, setUploadedFileF4airbersih, uploadedFileF4airkotor, setUploadedFileF4airkotor, uploadedFileF4SLF, setUploadedFileF4SLF, fetchDataLOG, fetchDataUtama, DataFileUtama, setDataFileUtama }) => {
 
 
-    const handleFileChange = (event) => {
+    const handleFileChange = async (event) => {
         const file = event.target.files[0];
         if (file && file.type === "application/pdf") {
             const renamedFile = new File([file], "Form Pendaftaran.pdf", { type: file.type });
             setUploadedFile(renamedFile);
+            try {
+                const token = localStorage.getItem("token");
+                const id = localStorage.getItem("id_project");
+                const iduser = localStorage.getItem("id");
+
+                if (uploadedFile) {
+                    const formDataedit = new FormData();
+                    formDataedit.append('file', renamedFile);
+                    formDataedit.append('oldFileName', uploadedFile[0].file);
+                    // Jika uploadedFile sudah ada, lakukan PUT untuk update
+                    await axios.put(`${API_URL}/api/detail-project-utama/${uploadedFile[0].id_project_utama}`, formDataedit, {
+                        headers: {
+                            'Authorization': `Bearer ${token}`,
+                        }
+                    });
+
+                    await axios.post(`${API_URL}/api/log-aktivitas`, {
+                        id_project: id,
+                        id_user: iduser,
+                        aktivitas: "mengganti file",
+                        keterangan: "Form Pendaftaran"
+                    }, {
+                        headers: {
+                            'Authorization': `Bearer ${token}`,
+                            'Content-Type': 'application/json'
+                        }
+                    });
+
+                } else {
+                    const formData = new FormData();
+                    formData.append('id_project', id);
+                    formData.append('pekerjaan', 'F1');
+                    formData.append('other_file', 'Form Pendaftaran.pdf');
+                    formData.append('file', renamedFile);
+                    // Jika belum ada file, lakukan POST untuk upload
+                    await axios.post(`${API_URL}/api/detail-project-utama`, formData, {
+                        headers: {
+                            'Authorization': `Bearer ${token}`,
+                        }
+                    });
+
+                    await axios.post(`${API_URL}/api/log-aktivitas`, {
+                        id_project: id,
+                        id_user: iduser,
+                        aktivitas: "mengupload file",
+                        keterangan: "Form Pendaftaran"
+                    }, {
+                        headers: {
+                            'Authorization': `Bearer ${token}`,
+                            'Content-Type': 'application/json'
+                        }
+                    });
+                }
+
+                // Jika diperlukan, panggil fungsi untuk memperbarui data
+                fetchDataUtama();
+                fetchDataLOG();
+            } catch (error) {
+                console.log("F1", error);
+            }
         } else {
             alert("Harap unggah file PDF.");
         }
@@ -163,14 +225,36 @@ const Form = ({ uploadedFile, setUploadedFile, uploadedFileF2, setUploadedFileF2
         document.getElementById("slf").click();
     };
 
-    const handleDownloadTemplate = () => {
+    const handleDownloadTemplate = async () => {
         if (uploadedFile) {
-            const url = URL.createObjectURL(uploadedFile);
+            const fileUrl = uploadedFile && uploadedFile[0]?.file
+                ? `${API_URL}/download/${uploadedFile[0].file}?rename=${uploadedFile[0].other_file}`
+                : URL.createObjectURL(uploadedFile[0].file);
             const link = document.createElement("a");
-            link.href = url;
+            link.href = fileUrl;
             link.download = uploadedFile.name;
             link.click();
-            URL.revokeObjectURL(url);
+            URL.revokeObjectURL(fileUrl);
+            try {
+                const token = localStorage.getItem("token");
+                const id = localStorage.getItem("id_project");
+                const iduser = localStorage.getItem("id");
+
+                await axios.post(`${API_URL}/api/log-aktivitas`, {
+                    id_project: id,
+                    id_user: iduser,
+                    aktivitas: "mengunduh file",
+                    keterangan: "Form Pendaftaran"
+                }, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+                fetchDataLOG();
+            } catch (error) {
+                console.log("logaktivitas", error)
+            }
         } else {
             alert("Tidak ada file yang diunggah.");
         }
@@ -295,10 +379,40 @@ const Form = ({ uploadedFile, setUploadedFile, uploadedFileF2, setUploadedFileF2
     };
 
 
-    const handleFileClick = () => {
+    const handleFileClick = async () => {
         if (uploadedFile) {
-            const fileURL = URL.createObjectURL(uploadedFile);
-            window.open(fileURL, '_blank');
+            const fileUrl = uploadedFile && uploadedFile[0] ? `${API_URL}/uploads/${uploadedFile[0]?.file}` : null;
+            try {
+                const token = localStorage.getItem("token");
+                const id = localStorage.getItem("id_project");
+                const iduser = localStorage.getItem("id");
+
+                await axios.post(`${API_URL}/api/log-aktivitas`, {
+                    id_project: id,
+                    id_user: iduser,
+                    aktivitas: "melihat file",
+                    keterangan: "Form Pendaftaran"
+                }, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+                fetchDataLOG();
+            } catch (error) {
+                console.log("logaktivitas", error)
+            }
+
+            if (fileUrl) {
+                // Jika file URL dari server tersedia, buka di tab baru
+                window.open(fileUrl, '_blank');
+            } else if (uploadedFile && uploadedFile[0]?.file) {
+                // Jika file URL tidak tersedia, gunakan URL.createObjectURL untuk membuka file lokal
+                const fileURL = URL.createObjectURL(uploadedFile[0].file);
+                window.open(fileURL, '_blank');
+            } else {
+                alert('File tidak tersedia.');
+            }
         }
     };
     const handleFileClickF2 = () => {
@@ -362,6 +476,29 @@ const Form = ({ uploadedFile, setUploadedFile, uploadedFileF2, setUploadedFileF2
         }
     };
 
+    const [serverFileSize, setServerFileSize] = useState(null);
+    const fileUrl = uploadedFile && uploadedFile[0] ? `${API_URL}/uploads/${uploadedFile[0].file}` : null;
+    useEffect(() => {
+        const fetchFileSize = async () => {
+            if (uploadedFile) {
+                try {
+                    const response = await axios.head(fileUrl);
+                    const contentLength = response.headers['content-length'];
+                    if (contentLength) {
+                        setServerFileSize((contentLength / (1024 * 1024)).toFixed(2)); // Convert to MB
+                    } else {
+                        setServerFileSize('Ukuran tidak tersedia');
+                    }
+                } catch (error) {
+                    // console.error('Gagal mendapatkan ukuran file:', error);
+                    setServerFileSize('Error mendapatkan ukuran');
+                }
+            }
+        };
+
+        fetchFileSize();
+    }, [uploadedFile, fileUrl]);
+
     return (
         <div>
             <Accordion type="multiple" className="w-full">
@@ -391,13 +528,13 @@ const Form = ({ uploadedFile, setUploadedFile, uploadedFileF2, setUploadedFileF2
                                 <div onClick={handleFileClick} className='flex gap-[12px] cursor-pointer'>
                                     <img src={Pdf} alt="pdf" className='w-[36px] h-[36px]' />
                                     <div className='text-left grid gap-[4px]'>
-                                        <h4 className='text-[12px] font-bold'>{uploadedFile.name}</h4>
-                                        <p className='text-[12px] text-[#717179]'>{(uploadedFile.size / (1024 * 1024)).toFixed(2)} MB</p>
+                                        <h4 className='text-[12px] font-bold'> {uploadedFile.name ? uploadedFile.name : uploadedFile[0].other_file}</h4>
+                                        <p className='text-[12px] text-[#717179]'> {uploadedFile.size ? (uploadedFile.size / (1024 * 1024)).toFixed(2) : serverFileSize}  MB</p>
                                     </div>
                                 </div>
                                 <div className='flex gap-[12px]'>
                                     <EditFile handleUploadClick={handleUploadClick} />
-                                    <HapusFile setUploadedFile={setUploadedFile} />
+                                    <HapusFile UploadedFile={uploadedFile} setUploadedFile={setUploadedFile} DataFileUtama={DataFileUtama} setDataFileUtama={setDataFileUtama} fetchDataLOG={fetchDataLOG} fetchDataUtama={fetchDataUtama} />
                                 </div>
                             </div>
                         )}
@@ -473,7 +610,7 @@ const Form = ({ uploadedFile, setUploadedFile, uploadedFileF2, setUploadedFileF2
                                     </div>
                                 </div>
                                 <div className='flex gap-[12px]'>
-                                <EditFile handleUploadClick={handleUploadClickF3pdf} />
+                                    <EditFile handleUploadClick={handleUploadClickF3pdf} />
                                     <HapusFile setUploadedFile={setUploadedFileF3pdf} />
                                 </div>
                             </div>
@@ -499,7 +636,7 @@ const Form = ({ uploadedFile, setUploadedFile, uploadedFileF2, setUploadedFileF2
                                     </div>
                                 </div>
                                 <div className='flex gap-[12px]'>
-                                <EditFile handleUploadClick={handleUploadClickF3docx} />
+                                    <EditFile handleUploadClick={handleUploadClickF3docx} />
                                     <HapusFile setUploadedFile={setUploadedFileF3docx} />
                                 </div>
                             </div>
@@ -555,7 +692,7 @@ const Form = ({ uploadedFile, setUploadedFile, uploadedFileF2, setUploadedFileF2
                                     </div>
                                 </div>
                                 <div className='flex gap-[12px]'>
-                                <EditFile handleUploadClick={handleUploadClickF4gambar} />
+                                    <EditFile handleUploadClick={handleUploadClickF4gambar} />
                                     <HapusFile setUploadedFile={setUploadedFileF4gambar} />
                                 </div>
                             </div>
@@ -594,7 +731,7 @@ const Form = ({ uploadedFile, setUploadedFile, uploadedFileF2, setUploadedFileF2
                                     </div>
                                 </div>
                                 <div className='flex gap-[12px]'>
-                                <EditFile handleUploadClick={handleUploadClickF4analisa} />
+                                    <EditFile handleUploadClick={handleUploadClickF4analisa} />
                                     <HapusFile setUploadedFile={setUploadedFileF4analisa} />
                                 </div>
                             </div>
@@ -633,7 +770,7 @@ const Form = ({ uploadedFile, setUploadedFile, uploadedFileF2, setUploadedFileF2
                                     </div>
                                 </div>
                                 <div className='flex gap-[12px]'>
-                                <EditFile handleUploadClick={handleUploadClickF4spek} />
+                                    <EditFile handleUploadClick={handleUploadClickF4spek} />
                                     <HapusFile setUploadedFile={setUploadedFileF4spek} />
                                 </div>
                             </div>
@@ -672,7 +809,7 @@ const Form = ({ uploadedFile, setUploadedFile, uploadedFileF2, setUploadedFileF2
                                     </div>
                                 </div>
                                 <div className='flex gap-[12px]'>
-                                <EditFile handleUploadClick={handleUploadClickF4airhujan} />
+                                    <EditFile handleUploadClick={handleUploadClickF4airhujan} />
                                     <HapusFile setUploadedFile={setUploadedFileF4airhujan} />
                                 </div>
                             </div>
@@ -711,7 +848,7 @@ const Form = ({ uploadedFile, setUploadedFile, uploadedFileF2, setUploadedFileF2
                                     </div>
                                 </div>
                                 <div className='flex gap-[12px]'>
-                                <EditFile handleUploadClick={handleUploadClickF4airbersih} />
+                                    <EditFile handleUploadClick={handleUploadClickF4airbersih} />
                                     <HapusFile setUploadedFile={setUploadedFileF4airbersih} />
                                 </div>
                             </div>
@@ -750,7 +887,7 @@ const Form = ({ uploadedFile, setUploadedFile, uploadedFileF2, setUploadedFileF2
                                     </div>
                                 </div>
                                 <div className='flex gap-[12px]'>
-                                <EditFile handleUploadClick={handleUploadClickF4airkotor} />
+                                    <EditFile handleUploadClick={handleUploadClickF4airkotor} />
                                     <HapusFile setUploadedFile={setUploadedFileF4airkotor} />
                                 </div>
                             </div>
@@ -789,7 +926,7 @@ const Form = ({ uploadedFile, setUploadedFile, uploadedFileF2, setUploadedFileF2
                                     </div>
                                 </div>
                                 <div className='flex gap-[12px]'>
-                                <EditFile handleUploadClick={handleUploadClickF4SLF} />
+                                    <EditFile handleUploadClick={handleUploadClickF4SLF} />
                                     <HapusFile setUploadedFile={setUploadedFileF4SLF} />
                                 </div>
                             </div>
