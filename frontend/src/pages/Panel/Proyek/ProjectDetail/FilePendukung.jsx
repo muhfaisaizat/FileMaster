@@ -24,21 +24,21 @@ import { X } from "lucide-react";
 import { API_URL } from "../../../../helpers/networt";
 import axios from 'axios';
 
-const FilePendukung = () => {
+const FilePendukung = ({fetchDataLOG}) => {
     const [uploadedFiles, setUploadedFiles] = useState([]);
     const [isDialogOpen, setDialogOpen] = useState(false);
     const [selectedFileId, setSelectedFileId] = useState(null);
 
     const formatData = (apiData) => {
         return {
-          id: apiData.id_project_pendukung, 
-          id_project: apiData.id_project,
-          file: apiData.other_file, 
-          isi: apiData.file, 
-          pekerjaan: apiData.pekerjaan,
-          format: apiData.format
+            id: apiData.id_project_pendukung,
+            id_project: apiData.id_project,
+            file: apiData.other_file,
+            isi: apiData.file,
+            pekerjaan: apiData.pekerjaan,
+            format: apiData.format
         };
-      };
+    };
 
     const fetchData = async () => {
         const token = localStorage.getItem("token");
@@ -50,12 +50,12 @@ const FilePendukung = () => {
                 },
             });
 
-           // Log untuk memastikan data yang diterima
+            // Log untuk memastikan data yang diterima
 
             // Pastikan response.data adalah array
             if (Array.isArray(response.data)) {
                 const formattedData = response.data.map(formatData);
-               
+
                 setUploadedFiles(formattedData);
             } else {
                 console.error("Data yang diterima bukan array");
@@ -66,13 +66,13 @@ const FilePendukung = () => {
     };
     // Ambil data dari API
     useEffect(() => {
-    
+
         fetchData();
     }, []);
 
     const handleFileChange = (event) => {
         const files = Array.from(event.target.files);
-        
+
         // Filter file yang valid berdasarkan tipe file
         const validFiles = files.filter(file =>
             file.type === "application/pdf" ||
@@ -82,16 +82,18 @@ const FilePendukung = () => {
             name: file.name,  // hanya menyimpan nama file untuk tampilan
             file: file,       // objek file disimpan di state
         }));
-    
+
         if (validFiles.length > 0) {
-    
+
             // Kirim file ke server menggunakan FormData dan axios
             validFiles.forEach((file) => {
                 const formData = new FormData();
+                const token = localStorage.getItem("token");
                 const id = localStorage.getItem("id_project");
+                const iduser = localStorage.getItem("id");
                 formData.append('id_project', id); // Menambahkan id_project
                 formData.append('file', file.file); // Menambahkan file yang diunggah
-    
+
                 // Kirim data ke API menggunakan axios
                 axios.post(`${API_URL}/api/detail-project-pendukung`, formData, {
                     headers: {
@@ -99,45 +101,98 @@ const FilePendukung = () => {
                         // 'Content-Type' tidak perlu ditentukan karena axios akan menangani FormData
                     }
                 })
-                .then(response => {
-                    // console.log("File berhasil diunggah:", response.data);
-                    fetchData();
-                })
-                .catch(error => {
-                    console.error("Terjadi kesalahan saat mengunggah file:", error);
-                });
+                    .then(response => {
+                        // Kirim log aktivitas jika pengunggahan berhasil
+                        return axios.post(`${API_URL}/api/log-aktivitas`, {
+                            id_project: id,
+                            id_user: iduser,
+                            aktivitas: "mengupload file",
+                            keterangan: "File Pendukung"
+                        }, {
+                            headers: {
+                                'Authorization': `Bearer ${token}`,
+                                'Content-Type': 'application/json'
+                            }
+                        });
+                    })
+                    .then(() => {
+                        fetchData(); // Memanggil ulang data setelah pengunggahan dan log berhasil
+                        fetchDataLOG();
+                    })
+                    .catch(error => {
+                        console.error("Terjadi kesalahan saat mengunggah file atau log aktivitas:", error);
+                    });
             });
         } else {
             alert("Harap unggah file PDF atau DOCX.");
         }
     };
-    
-    
-    
+
+
+
 
     const handleUploadClick = () => {
         document.getElementById("pendukung").click();
     };
 
-    const handleView = (file) => {
+    const handleView = async (file) => {
         if (file) {
-            const url = URL.createObjectURL(file);
-            window.open(url, '_blank');
-            URL.revokeObjectURL(url);
+            window.open(`${API_URL}/uploads/${file}`, '_blank');
+            try {
+                const token = localStorage.getItem("token");
+                const id = localStorage.getItem("id_project");
+                const iduser = localStorage.getItem("id");
+        
+                await axios.post(`${API_URL}/api/log-aktivitas`, {
+                    id_project: id,
+                    id_user: iduser,
+                    aktivitas: "melihat file",
+                    keterangan: "File Pendukung"
+                }, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+                fetchDataLOG();
+            } catch (error) {
+                console.log("logaktivitas", error)
+            }
         } else {
             alert("File tidak tersedia untuk dilihat.");
         }
     };
 
-    const handleDownload = (fileName, renameFile) => {
+    const handleDownload = async (fileName, renameFile) => {
         if (fileName) {
             const url = `${API_URL}/download/${fileName}?rename=${renameFile}`;
 
-        // Membuat elemen <a> untuk mendownload file
-        const link = document.createElement("a");
-        link.href = url;
-        link.download = renameFile || fileName;  // Nama file saat diunduh
-        link.click();  // Memulai download
+            // Membuat elemen <a> untuk mendownload file
+            const link = document.createElement("a");
+            link.href = url;
+            link.download = renameFile || fileName;  // Nama file saat diunduh
+            link.click();  // Memulai download
+
+            try {
+                const token = localStorage.getItem("token");
+                const id = localStorage.getItem("id_project");
+                const iduser = localStorage.getItem("id");
+        
+                await axios.post(`${API_URL}/api/log-aktivitas`, {
+                    id_project: id,
+                    id_user: iduser,
+                    aktivitas: "mengunduh file",
+                    keterangan: "File Pendukung"
+                }, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+                fetchDataLOG();
+            } catch (error) {
+                console.log("logaktivitas", error)
+            }
         } else {
             alert("File tidak tersedia untuk diunduh.");
         }
@@ -145,7 +200,9 @@ const FilePendukung = () => {
 
     const handleDelete = async () => {
         const token = localStorage.getItem("token");
-    
+        const id = localStorage.getItem("id_project");
+        const iduser = localStorage.getItem("id");
+
         try {
             // Mengirimkan permintaan DELETE ke API
             await axios.delete(`${API_URL}/api/detail-project-pendukung/${selectedFileId}`, {
@@ -153,17 +210,32 @@ const FilePendukung = () => {
                     Authorization: `Bearer ${token}`,
                 },
             });
-    
+
+            await axios.post(`${API_URL}/api/log-aktivitas`, {
+                id_project: id,
+                id_user: iduser,
+                aktivitas: "menghapus file",
+                keterangan: "File Pendukung"
+            }, {
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                }
+            });
+
+
+
             const updatedFiles = uploadedFiles.filter(file => file.id !== selectedFileId);
             setUploadedFiles(updatedFiles);
-    
-            
+            fetchDataLOG();
+
+
         } catch (error) {
             console.error("Gagal menghapus pengguna:", error);
-    
-            
+
+
         }
-        
+
         setDialogOpen(false);
         setSelectedFileId(null);
     };
@@ -201,7 +273,7 @@ const FilePendukung = () => {
                                         </DropdownMenuTrigger>
                                         <DropdownMenuContent align="start" className="w-[164px]">
                                             <DropdownMenuItem
-                                               onClick={() => window.open(`${API_URL}/uploads/${item.isi}`, '_blank')}
+                                                onClick={() => handleView(item.isi)}
                                                 className="p-3 gap-3 text-[14px] font-medium"
                                             >
                                                 View

@@ -31,7 +31,7 @@ import { API_URL } from "../../../../helpers/networt";
 import axios from 'axios';
 
 
-const FileUtama = () => {
+const FileUtama = ({fetchDataLOG}) => {
     const [isDialogOpen, setDialogOpen] = useState(false);
     const DataRole = [
         { id: "m5gr84i9", name: 'pdf' },
@@ -84,6 +84,7 @@ const FileUtama = () => {
         fetchData();
     }, []);
     const [selectedFileId, setSelectedFileId] = useState(null);
+    const [selectedFilename, setSelectedFilename] = useState(null);
 
     const [selectedFormats, setSelectedFormats] = useState([]);
     const [searchTerm, setSearchTerm] = useState('');
@@ -103,6 +104,8 @@ const FileUtama = () => {
 
       const handleDelete = async () => {
         const token = localStorage.getItem("token");
+        const id = localStorage.getItem("id_project");
+        const iduser = localStorage.getItem("id");
     
         try {
             // Mengirimkan permintaan DELETE ke API
@@ -111,9 +114,21 @@ const FileUtama = () => {
                     Authorization: `Bearer ${token}`,
                 },
             });
+            await axios.post(`${API_URL}/api/log-aktivitas`, {
+                id_project: id,
+                id_user: iduser,
+                aktivitas: "menghapus file",
+                keterangan: selectedFilename
+            }, {
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                }
+            });
     
             const updatedFiles = DataFileUtama.filter(file => file.id !== selectedFileId);
             setDataFileUtama(updatedFiles);
+            fetchDataLOG();
     
             
         } catch (error) {
@@ -126,7 +141,35 @@ const FileUtama = () => {
         setSelectedFileId(null);
     };
 
-    const handleDownload = (fileName, renameFile) => {
+    const handleView = async (file, namefile) => {
+        if (file) {
+            window.open(`${API_URL}/uploads/${file}`, '_blank');
+            try {
+                const token = localStorage.getItem("token");
+                const id = localStorage.getItem("id_project");
+                const iduser = localStorage.getItem("id");
+        
+                await axios.post(`${API_URL}/api/log-aktivitas`, {
+                    id_project: id,
+                    id_user: iduser,
+                    aktivitas: "melihat file",
+                    keterangan: namefile
+                }, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+                fetchDataLOG();
+            } catch (error) {
+                console.log("logaktivitas", error)
+            }
+        } else {
+            alert("File tidak tersedia untuk dilihat.");
+        }
+    };
+
+    const handleDownload = async (fileName, renameFile) => {
         if (fileName) {
             const url = `${API_URL}/download/${fileName}?rename=${renameFile}`;
 
@@ -135,6 +178,27 @@ const FileUtama = () => {
         link.href = url;
         link.download = renameFile || fileName;  // Nama file saat diunduh
         link.click();  // Memulai download
+
+        try {
+            const token = localStorage.getItem("token");
+            const id = localStorage.getItem("id_project");
+            const iduser = localStorage.getItem("id");
+    
+            await axios.post(`${API_URL}/api/log-aktivitas`, {
+                id_project: id,
+                id_user: iduser,
+                aktivitas: "mengunduh file",
+                keterangan: renameFile
+            }, {
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                }
+            });
+            fetchDataLOG();
+        } catch (error) {
+            console.log("logaktivitas", error)
+        }
         } else {
             alert("File tidak tersedia untuk diunduh.");
         }
@@ -193,7 +257,7 @@ const FileUtama = () => {
                                             </Button>
                                         </DropdownMenuTrigger>
                                         <DropdownMenuContent align="start" className="w-[100px]">
-                                        <DropdownMenuItem onClick={() => window.open(`${API_URL}/uploads/${item.isi}`, '_blank')} className="p-3 gap-3 text-[14px] font-medium ">
+                                        <DropdownMenuItem  onClick={() => handleView(item.isi, item.file)} className="p-3 gap-3 text-[14px] font-medium ">
                                                 View
                                             </DropdownMenuItem>
                                             <DropdownMenuItem 
@@ -204,6 +268,7 @@ const FileUtama = () => {
                                             <DropdownMenuItem  
                                             onClick={() => {
                                                 setSelectedFileId(item.id);
+                                                setSelectedFilename(item.file);
                                                     setDialogOpen(true);
                                                 }} 
                                                 className="p-3 gap-3 text-[14px] font-medium text-rose-500 focus:text-rose-500">

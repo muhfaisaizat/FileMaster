@@ -81,6 +81,50 @@ const ProjectDetail = () => {
 
     fetchData();
   }, []);
+  const [activities, setaktivitas] = useState([]);
+  const formatDataLOG = (apiData) => {
+    return {
+      id: apiData.id,  
+      id_project: apiData.id_project, 
+      date: apiData.formatted_createdAt,
+      user: apiData.name,
+      action: apiData.aktivitas,
+      file: `[${apiData.project_with_keterangan}]`,
+      avatar: apiData.image,
+    };
+  };
+
+  const fetchDataLOG = async () => {
+    const token = localStorage.getItem("token");
+    const id = localStorage.getItem("id_project");
+    try {
+      const response = await axios.get(`${API_URL}/api/log-aktivitas/${id}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      // Log untuk memastikan data yang diterima
+    //   console.log(response.data)
+
+      // Pastikan response.data adalah array
+      if (response.data) {
+        // Format data langsung sebagai objek
+        const formattedData = response.data.map(formatDataLOG);
+        // console.log(formattedData)
+        setaktivitas(formattedData); // Simpan sebagai objek
+      } else {
+        console.error("Data yang diterima bukan array");
+      }
+    } catch (error) {
+      console.error("Error fetching data", error);
+    }
+  };
+  // Ambil data dari API
+  useEffect(() => {
+
+    fetchDataLOG();
+  }, []);
 
   
 
@@ -104,6 +148,8 @@ const ProjectDetail = () => {
               uploadedFileF4={isFileUploadedF4}
               lengF={lengF}
               Data={Data}
+              activities={activities}
+              fetchDataLOG={fetchDataLOG}
             />
           </div>
           <div className={`${isFolderVisible ? 'lg:w-[24%]' : 'lg:w-[28%]'

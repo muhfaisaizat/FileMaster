@@ -37,6 +37,7 @@ const Login = () => {
             localStorage.setItem("name", response.data.user.name);
             localStorage.setItem("email", response.data.user.email);
             localStorage.setItem("id", response.data.user.id);
+            localStorage.setItem("foto", response.data.user.image);
             if (rememberMe) {
                 localStorage.setItem("savedEmail", email);
                 localStorage.setItem("savedPassword", password);
