@@ -26,6 +26,8 @@ import {
 } from "@/components/ui/select"
 import { useToast } from '@/hooks/use-toast'
 import { ToastAction } from "@/components/ui/toast"
+import { API_URL } from "../../../helpers/networt";
+import axios from 'axios';
 
 const AddUser = ({className, buttonProps, textButton}) => {
     const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
@@ -73,6 +75,7 @@ const AddUser = ({className, buttonProps, textButton}) => {
         password: '',
         confirmPassword: '',
         role: '',
+        status:'Aktif',
     });
 
     const togglePasswordVisibility = () => {
@@ -92,9 +95,19 @@ const AddUser = ({className, buttonProps, textButton}) => {
         setFormData({ ...formData, role: value });
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
         const { nama, email, password, confirmPassword, role } = formData;
+        const token = localStorage.getItem("token");
+        const form = new FormData();
+        form.append('name', formData.nama);
+        form.append('email', formData.email);
+        form.append('password', formData.password);
+        form.append('role', formData.role);
+        form.append('status', formData.status);
+        if (fileInputRef.current.files[0]) {
+            form.append("image", fileInputRef.current.files[0]);
+        }
 
         // Validasi
         if (!nama) {
@@ -147,14 +160,41 @@ const AddUser = ({className, buttonProps, textButton}) => {
             return;
         }
 
-        // Logika penyimpanan data di sini
-        // Misalnya: simpanData(formData);
-
-        toast({
-            title: "Sukses!",
-            description: "Pengguna berhasil ditambahkan.",
-            action: <ToastAction altText="Try again">Cancel</ToastAction>,
-        });
+        try {
+            const response = await axios.post(`${API_URL}/api/users`, form, {
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'multipart/form-data'
+                }
+            });
+            toast({
+                title: 'User Added Successfully',
+                description: `User ${formData.nama} has been created.`,
+                status: 'success',
+                action: <ToastAction altText="Try again">Cancel</ToastAction>,
+            });
+        } catch (error) {
+            console.error('Error adding user:', error);
+            if (error.response) {
+                // Server responded with a status other than 2xx
+                console.error('Response data:', error.response.data);
+                console.error('Response status:', error.response.status);
+                console.error('Response headers:', error.response.headers);
+            } else if (error.request) {
+                // Request was made but no response received
+                console.error('Request data:', error.request);
+            } else {
+                // Other errors (e.g., configuration issues)
+                console.error('Error message:', error.message);
+            }
+            toast({
+                title: 'Error Adding User',
+                description: 'An internal server error occurred. Please try again later.',
+                status: 'error',
+                action: <ToastAction altText="Try again">Cancel</ToastAction>,
+            });
+        }
+        
 
         setIsOpen(false);
     };

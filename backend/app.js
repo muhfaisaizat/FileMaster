@@ -13,6 +13,7 @@ const swaggerDocs = require("./swagger");
 dotenv.config();
 
 const app = express();
+const path = require('path');
 
 // Configure CORS
 app.use(cors({
@@ -20,6 +21,9 @@ app.use(cors({
     methods: ["GET", "POST", "PUT", "DELETE"], // Allowed methods
     allowedHeaders: ["Content-Type", "Authorization"], // Allowed headers
 }));
+
+// Serve static files from the 'images' directory
+app.use('/images', express.static(path.join(__dirname, 'images')));
 
 app.use(express.json());
 

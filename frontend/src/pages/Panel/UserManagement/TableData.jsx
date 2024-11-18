@@ -81,12 +81,13 @@ const TableData = () => {
             role: apiData.role,     // Peran pengguna
             status: apiData.status, // Mengubah status "Active" menjadi "Aktif"
             email: apiData.email,   // Email pengguna
+            // password: apiData.password,
             date: new Date(apiData.createdAt).toLocaleDateString('id-ID', { 
                 day: 'numeric', 
                 month: 'long', 
                 year: 'numeric' 
             }), // Format tanggal menjadi format Indonesia
-            foto: 'https://github.com/shadcn.png'
+            foto: apiData.image
         };
     };
 

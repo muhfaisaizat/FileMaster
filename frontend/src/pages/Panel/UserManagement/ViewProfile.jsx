@@ -26,6 +26,7 @@ import {
 } from "@/components/ui/select"
 import { useToast } from '@/hooks/use-toast'
 import { ToastAction } from "@/components/ui/toast"
+import { API_URL } from "../../../helpers/networt";
 
 const ViewProfile = ({ isOpen, setIsOpen, selectedProduct }) => {
     const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
@@ -61,7 +62,7 @@ const ViewProfile = ({ isOpen, setIsOpen, selectedProduct }) => {
                 )}
                 <div className={`${isMobile ? 'pb-[45px]' : 'grid gap-[16px] py-[12px]'}`}>
                     <div className='h-[154px] w-[154px]'>
-                        <img src={selectedProduct.foto} alt={selectedProduct.nama} className='w-full h-full rounded-[8px]' />
+                        <img src={selectedProduct.foto ? `${API_URL}/images/${selectedProduct.foto}` : "https://img.freepik.com/free-vector/blue-circle-with-white-user_78370-4707.jpg"} alt={selectedProduct.foto} className='w-full h-full rounded-[8px]' />
                     </div>
                     <table className={`table-auto w-full ${isMobile && ('mt-[16px]')} `}>
                         <tbody className=' w-full text-[14px]'>
