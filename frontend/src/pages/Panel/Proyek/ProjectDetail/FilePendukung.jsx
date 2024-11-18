@@ -72,21 +72,48 @@ const FilePendukung = () => {
 
     const handleFileChange = (event) => {
         const files = Array.from(event.target.files);
+        
+        // Filter file yang valid berdasarkan tipe file
         const validFiles = files.filter(file =>
             file.type === "application/pdf" ||
             file.type === "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
         ).map((file, index) => ({
             id: uploadedFiles.length + index + 1,
-            name: file.name,
-            file: file,
+            name: file.name,  // hanya menyimpan nama file untuk tampilan
+            file: file,       // objek file disimpan di state
         }));
-
+    
         if (validFiles.length > 0) {
-            setUploadedFiles(prevFiles => [...prevFiles, ...validFiles]);
+    
+            // Kirim file ke server menggunakan FormData dan axios
+            validFiles.forEach((file) => {
+                const formData = new FormData();
+                const id = localStorage.getItem("id_project");
+                formData.append('id_project', id); // Menambahkan id_project
+                formData.append('file', file.file); // Menambahkan file yang diunggah
+    
+                // Kirim data ke API menggunakan axios
+                axios.post(`${API_URL}/api/detail-project-pendukung`, formData, {
+                    headers: {
+                        'accept': 'application/json',
+                        // 'Content-Type' tidak perlu ditentukan karena axios akan menangani FormData
+                    }
+                })
+                .then(response => {
+                    // console.log("File berhasil diunggah:", response.data);
+                    fetchData();
+                })
+                .catch(error => {
+                    console.error("Terjadi kesalahan saat mengunggah file:", error);
+                });
+            });
         } else {
             alert("Harap unggah file PDF atau DOCX.");
         }
     };
+    
+    
+    
 
     const handleUploadClick = () => {
         document.getElementById("pendukung").click();
@@ -163,7 +190,7 @@ const FilePendukung = () => {
                 {uploadedFiles.length > 0 ? (
                     <div className="flex flex-wrap -m-4 mt-[12px]">
                         {uploadedFiles.map((item) => (
-                            <div key={item.id} title={item.name} className="lg:w-1/5 md:w-1/2 p-4 w-1/2">
+                            <div key={item.id} title={item.file} className="lg:w-1/5 md:w-1/2 p-4 w-1/2">
                                 <div className="grid justify-end">
                                     <DropdownMenu>
                                         <DropdownMenuTrigger asChild>
@@ -200,13 +227,13 @@ const FilePendukung = () => {
                                 <div className="grid gap-[16px]">
                                     <div className="grid justify-center">
                                         <img
-                                            src={item.file.endsWith('.pdf') ? Pdf : Docx}
+                                            src={item.isi?.endsWith('.pdf') ? Pdf : Docx}
                                             alt="file icon"
                                             className="w-[40px] h-[40px]"
                                         />
                                     </div>
                                     <h3 className="text-center text-[12px] font-medium">
-                                        {item.file.length > 20 ? `${item.name.slice(0, 20)}...` : item.file}
+                                        {item.file.length > 20 ? `${item.file.slice(0, 20)}...` : item.file}
                                     </h3>
                                 </div>
                             </div>
