@@ -9,7 +9,7 @@ import FilePendukung from './FilePendukung';
 import InformasiProyek from './InformasiProyek';
 import LogActivity from './LogActivity';
 
-const TableData = ({uploadedFile, uploadedFileF2, uploadedFileF3, uploadedFileF4, lengF}) => {
+const TableData = ({uploadedFile, uploadedFileF2, uploadedFileF3, uploadedFileF4, lengF, Data}) => {
     const [activeTab, setActiveTab] = useState("Direktori");
     const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
 
@@ -34,8 +34,8 @@ const TableData = ({uploadedFile, uploadedFileF2, uploadedFileF3, uploadedFileF4
                 </Link>
                 <div className='flex justify-between items-center py-[16px]'>
                     <div>
-                        <h1 className='text-[24px] font-medium'>PT Indomaret</h1>
-                        <p className='text-[14px] font-medium text-[#717179]'>Persiapan Bangun</p>
+                        <h1 className='text-[24px] font-medium'>{Data.nama || 'Nama tidak tersedia'}</h1>
+                        <p className='text-[14px] font-medium text-[#717179]'>{Data.kategori || 'kategori tidak tersedia'}</p>
                     </div>
                     <div className=' grid items-center '>
                       <InformasiProyek/>

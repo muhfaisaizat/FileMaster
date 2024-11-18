@@ -14,6 +14,27 @@ dotenv.config();
 
 const app = express();
 const path = require('path');
+const fs = require('fs');
+
+// Rute untuk mendownload file langsung
+app.get('/download/:fileName', (req, res) => {
+    const fileName = req.params.fileName; // Nama file asli di server
+    const renameFile = req.query.rename || fileName; // Nama baru yang ingin digunakan saat mendownload
+
+    const filePath = path.join(__dirname, 'uploads', fileName);
+
+    // Cek apakah file ada di server
+    if (fs.existsSync(filePath)) {
+        // Mendownload file dengan nama baru yang ditentukan
+        res.download(filePath, renameFile, (err) => {
+            if (err) {
+                res.status(500).send("Gagal mengunduh file.");
+            }
+        });
+    } else {
+        res.status(404).send("File tidak ditemukan.");
+    }
+});
 
 // Configure CORS
 app.use(cors({
@@ -24,6 +45,7 @@ app.use(cors({
 
 // Serve static files from the 'images' directory
 app.use('/images', express.static(path.join(__dirname, 'images')));
+app.use('/uploads', express.static('uploads'));
 
 app.use(express.json());
 

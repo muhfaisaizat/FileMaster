@@ -1,9 +1,11 @@
-import React,{useState, useContext} from 'react'
+import React, { useState, useContext, useEffect } from 'react'
 import TableData from './TableData'
 import { ScrollArea } from "@/components/ui/scroll-area"
 import Form from './Form'
 import Folder from './Folder'
 import { VisibilityContext } from '../../MainPanel/Layout';
+import { API_URL } from "../../../../helpers/networt";
+import axios from 'axios';
 
 
 const ProjectDetail = () => {
@@ -22,30 +24,89 @@ const ProjectDetail = () => {
   const isFileUploadedF3 = uploadedFileF3pdf || uploadedFileF3docx;
   const isFileUploadedF4 = uploadedFileF4gambar || uploadedFileF4analisa || uploadedFileF4spek || uploadedFileF4airhujan || uploadedFileF4airbersih || uploadedFileF4airkotor || uploadedFileF4SLF;
   const lengF = [uploadedFile, uploadedFileF2, isFileUploadedF3, isFileUploadedF4].filter(file => file !== null && file !== undefined).length;
+  const [Data, setdata] = useState({});
+  const formatData = (apiData) => {
+    return {
+      id: apiData["ID"],  // Menambahkan "m" pada ID
+      nama: apiData["Nama Project"], // Mengakses "Nama Project" yang memiliki spasi
+      kategori: apiData["Kategori Project"], // Mengakses "Kategori Project"
+      deskripsi: apiData.Deskripsi,  // Mengakses Deskripsi
+      namaPengaju: apiData["Nama Pengaju"], // Mengakses "Nama Pengaju"
+      jabatan: apiData.Jabatan, // Mengakses Jabatan
+      perusahaan: apiData["Instansi/Organisasi"], // Mengakses "Instansi/Organisasi"
+      noTelp: apiData["No Telp"], // Mengakses "No Telp"
+      alamatLengkap: apiData["Alamat Lengkap"], // Mengakses "Alamat Lengkap"
+      provinsi: apiData.Provinsi, // Mengakses Provinsi
+      kabupatenKota: apiData["Kabupaten/Kota"], // Mengakses "Kabupaten/Kota"
+      kecamatan: apiData.Kecamatan, // Mengakses Kecamatan
+      kelurahanDesa: apiData["Kelurahan/Desa"], // Mengakses "Kelurahan/Desa"
+      archive: apiData.Archive,  // Mengakses Archive
+      date: new Date(apiData.Date).toLocaleDateString('id-ID', {  // Format tanggal "Date"
+        day: 'numeric',
+        month: 'long',
+        year: 'numeric'
+      }),
+      Aktivitas: apiData.Aktivitas, // Mengakses Aktivitas
+      Progres: apiData.Progres // Mengakses Progres
+    };
+  };
+
+  const fetchData = async () => {
+    const token = localStorage.getItem("token");
+    const id = localStorage.getItem("id_project");
+    try {
+      const response = await axios.get(`${API_URL}/api/projects/${id}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      // Log untuk memastikan data yang diterima
+      // console.log(response.data)
+
+      // Pastikan response.data adalah array
+      if (response.data) {
+        // Format data langsung sebagai objek
+        const formattedData = formatData(response.data);
+        setdata(formattedData); // Simpan sebagai objek
+      } else {
+        console.error("Data yang diterima bukan array");
+      }
+    } catch (error) {
+      console.error("Error fetching data", error);
+    }
+  };
+  // Ambil data dari API
+  useEffect(() => {
+
+    fetchData();
+  }, []);
+
+  
+
 
   return (
 
     <ScrollArea className="h-[92vh] w-full bg-white">
       <div className=" py-3 px-6 mx-auto">
         <div className="flex flex-wrap -m-4">
-        {isFolderVisible && (
+          {isFolderVisible && (
             <div className="lg:w-[20%] md:w-1/2 w-full h-full">
               <Folder />
             </div>
           )}
-          <div className={`${
-              isFolderVisible ? 'lg:w-[56%] border-l' : 'lg:w-[72%]'
+          <div className={`${isFolderVisible ? 'lg:w-[56%] border-l' : 'lg:w-[72%]'
             } md:w-1/2 w-full `}>
-            <TableData 
-            uploadedFile={uploadedFile}
-            uploadedFileF2={uploadedFileF2}
-            uploadedFileF3={isFileUploadedF3}
-            uploadedFileF4={isFileUploadedF4}
-            lengF={lengF}
+            <TableData
+              uploadedFile={uploadedFile}
+              uploadedFileF2={uploadedFileF2}
+              uploadedFileF3={isFileUploadedF3}
+              uploadedFileF4={isFileUploadedF4}
+              lengF={lengF}
+              Data={Data}
             />
           </div>
-          <div className={`${
-              isFolderVisible ? 'lg:w-[24%]' : 'lg:w-[28%]'
+          <div className={`${isFolderVisible ? 'lg:w-[24%]' : 'lg:w-[28%]'
             } md:w-1/2 w-full border`} >
             <Form
               uploadedFile={uploadedFile}

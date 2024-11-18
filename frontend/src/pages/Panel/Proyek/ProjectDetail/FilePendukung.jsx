@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import {
     DropdownMenu,
@@ -21,11 +21,54 @@ import {
     DialogClose
 } from "@/components/ui/dialog";
 import { X } from "lucide-react";
+import { API_URL } from "../../../../helpers/networt";
+import axios from 'axios';
 
 const FilePendukung = () => {
     const [uploadedFiles, setUploadedFiles] = useState([]);
     const [isDialogOpen, setDialogOpen] = useState(false);
     const [selectedFileId, setSelectedFileId] = useState(null);
+
+    const formatData = (apiData) => {
+        return {
+          id: apiData.id_project_pendukung, 
+          id_project: apiData.id_project,
+          file: apiData.other_file, 
+          isi: apiData.file, 
+          pekerjaan: apiData.pekerjaan,
+          format: apiData.format
+        };
+      };
+
+    const fetchData = async () => {
+        const token = localStorage.getItem("token");
+        const id = localStorage.getItem("id_project");
+        try {
+            const response = await axios.get(`${API_URL}/api/detail-project-pendukung/${id}`, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+
+           // Log untuk memastikan data yang diterima
+
+            // Pastikan response.data adalah array
+            if (Array.isArray(response.data)) {
+                const formattedData = response.data.map(formatData);
+               
+                setUploadedFiles(formattedData);
+            } else {
+                console.error("Data yang diterima bukan array");
+            }
+        } catch (error) {
+            console.error("Error fetching data", error);
+        }
+    };
+    // Ambil data dari API
+    useEffect(() => {
+    
+        fetchData();
+    }, []);
 
     const handleFileChange = (event) => {
         const files = Array.from(event.target.files);
@@ -59,25 +102,45 @@ const FilePendukung = () => {
         }
     };
 
-    const handleDownload = (file) => {
-        if (file) {
-            const url = URL.createObjectURL(file);
-            const link = document.createElement("a");
-            link.href = url;
-            link.download = file.name;
-            link.click();
-            URL.revokeObjectURL(url);
+    const handleDownload = (fileName, renameFile) => {
+        if (fileName) {
+            const url = `${API_URL}/download/${fileName}?rename=${renameFile}`;
+
+        // Membuat elemen <a> untuk mendownload file
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = renameFile || fileName;  // Nama file saat diunduh
+        link.click();  // Memulai download
         } else {
             alert("File tidak tersedia untuk diunduh.");
         }
     };
 
-    const handleDelete = () => {
-        const updatedFiles = uploadedFiles.filter(file => file.id !== selectedFileId);
-        setUploadedFiles(updatedFiles);
+    const handleDelete = async () => {
+        const token = localStorage.getItem("token");
+    
+        try {
+            // Mengirimkan permintaan DELETE ke API
+            await axios.delete(`${API_URL}/api/detail-project-pendukung/${selectedFileId}`, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+    
+            const updatedFiles = uploadedFiles.filter(file => file.id !== selectedFileId);
+            setUploadedFiles(updatedFiles);
+    
+            
+        } catch (error) {
+            console.error("Gagal menghapus pengguna:", error);
+    
+            
+        }
+        
         setDialogOpen(false);
         setSelectedFileId(null);
     };
+
 
     return (
         <div>
@@ -111,13 +174,13 @@ const FilePendukung = () => {
                                         </DropdownMenuTrigger>
                                         <DropdownMenuContent align="start" className="w-[164px]">
                                             <DropdownMenuItem
-                                                onClick={() => handleView(item.file)}
+                                               onClick={() => window.open(`${API_URL}/uploads/${item.isi}`, '_blank')}
                                                 className="p-3 gap-3 text-[14px] font-medium"
                                             >
                                                 View
                                             </DropdownMenuItem>
                                             <DropdownMenuItem
-                                                onClick={() => handleDownload(item.file)}
+                                                onClick={() => handleDownload(item.isi, item.file)}
                                                 className="p-3 gap-3 text-[14px] font-medium"
                                             >
                                                 Download
@@ -137,13 +200,13 @@ const FilePendukung = () => {
                                 <div className="grid gap-[16px]">
                                     <div className="grid justify-center">
                                         <img
-                                            src={item.name.endsWith('.pdf') ? Pdf : Docx}
+                                            src={item.file.endsWith('.pdf') ? Pdf : Docx}
                                             alt="file icon"
                                             className="w-[40px] h-[40px]"
                                         />
                                     </div>
                                     <h3 className="text-center text-[12px] font-medium">
-                                        {item.name.length > 20 ? `${item.name.slice(0, 20)}...` : item.name}
+                                        {item.file.length > 20 ? `${item.name.slice(0, 20)}...` : item.file}
                                     </h3>
                                 </div>
                             </div>

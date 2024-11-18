@@ -1,4 +1,4 @@
-import React,{useState} from 'react'
+import React,{useState, useEffect} from 'react'
 import { Input } from '@/components/ui/input'
 import { SearchNormal1 } from 'iconsax-react';
 import { Button } from "@/components/ui/button"
@@ -27,6 +27,8 @@ import {
     DialogClose
 } from "@/components/ui/dialog";
 import { X } from "lucide-react";
+import { API_URL } from "../../../../helpers/networt";
+import axios from 'axios';
 
 
 const FileUtama = () => {
@@ -36,10 +38,51 @@ const FileUtama = () => {
         { id: "m5gr84i7", name: 'docx' },
     ];
     const [DataFileUtama, setDataFileUtama] = useState([
-        { id: 1, file: 'Form Prndaftaran.pdf' , format:'pdf'},
-        { id: 2, file: 'F3.docx', format:'docx' },
-        { id: 3, file: 'Informasi Pekerjaan.docx', format:'docx' },
+        // { id: 1, file: 'Form Prndaftaran.pdf' , format:'pdf'},
+        // { id: 2, file: 'F3.docx', format:'docx' },
+        // { id: 3, file: 'Informasi Pekerjaan.docx', format:'docx' },
     ])
+
+    const formatData = (apiData) => {
+        return {
+          id: apiData.id_project_utama, 
+          id_project: apiData.id_project,
+          file: apiData.other_file, 
+          isi: apiData.file, 
+          pekerjaan: apiData.pekerjaan,
+          format: apiData.format
+        };
+      };
+
+    const fetchData = async () => {
+        const token = localStorage.getItem("token");
+        const id = localStorage.getItem("id_project");
+        try {
+            const response = await axios.get(`${API_URL}/api/detail-project-utama/${id}`, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+
+           // Log untuk memastikan data yang diterima
+
+            // Pastikan response.data adalah array
+            if (Array.isArray(response.data)) {
+                const formattedData = response.data.map(formatData);
+               
+                setDataFileUtama(formattedData);
+            } else {
+                console.error("Data yang diterima bukan array");
+            }
+        } catch (error) {
+            console.error("Error fetching data", error);
+        }
+    };
+    // Ambil data dari API
+    useEffect(() => {
+    
+        fetchData();
+    }, []);
     const [selectedFileId, setSelectedFileId] = useState(null);
 
     const [selectedFormats, setSelectedFormats] = useState([]);
@@ -58,12 +101,45 @@ const FileUtama = () => {
         item.file.toLowerCase().includes(searchTerm.toLowerCase())
       );
 
-      const handleDelete = () => {
-        const updatedFiles = DataFileUtama.filter(file => file.id !== selectedFileId);
-        setDataFileUtama(updatedFiles);
+      const handleDelete = async () => {
+        const token = localStorage.getItem("token");
+    
+        try {
+            // Mengirimkan permintaan DELETE ke API
+            await axios.delete(`${API_URL}/api/detail-project-utama/${selectedFileId}`, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+    
+            const updatedFiles = DataFileUtama.filter(file => file.id !== selectedFileId);
+            setDataFileUtama(updatedFiles);
+    
+            
+        } catch (error) {
+            console.error("Gagal menghapus pengguna:", error);
+    
+            
+        }
+        
         setDialogOpen(false);
         setSelectedFileId(null);
     };
+
+    const handleDownload = (fileName, renameFile) => {
+        if (fileName) {
+            const url = `${API_URL}/download/${fileName}?rename=${renameFile}`;
+
+        // Membuat elemen <a> untuk mendownload file
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = renameFile || fileName;  // Nama file saat diunduh
+        link.click();  // Memulai download
+        } else {
+            alert("File tidak tersedia untuk diunduh.");
+        }
+    };
+    
 
 
     return (
@@ -104,7 +180,7 @@ const FileUtama = () => {
             <h2 className='text-[16px] font-semibold h-[36px] items-center'>File Utama</h2>
 
             <div className="container mx-auto">
-                {DataFileUtama.length > 0 ? (
+                {filteredData.length > 0 ? (
                     <div className="flex flex-wrap -m-4">
                         {filteredData.map((item) => (
                             <div key={item.id} className="lg:w-1/5 sm:w-1/2 md:w-1/3 p-4 w-1/2" title={item.file}>
@@ -117,10 +193,12 @@ const FileUtama = () => {
                                             </Button>
                                         </DropdownMenuTrigger>
                                         <DropdownMenuContent align="start" className="w-[100px]">
-                                        <DropdownMenuItem className="p-3 gap-3 text-[14px] font-medium ">
+                                        <DropdownMenuItem onClick={() => window.open(`${API_URL}/uploads/${item.isi}`, '_blank')} className="p-3 gap-3 text-[14px] font-medium ">
                                                 View
                                             </DropdownMenuItem>
-                                            <DropdownMenuItem className="p-3 gap-3 text-[14px] font-medium ">
+                                            <DropdownMenuItem 
+                                           onClick={() => handleDownload(item.isi, item.file)}
+                                             className="p-3 gap-3 text-[14px] font-medium ">
                                                 Download
                                             </DropdownMenuItem>
                                             <DropdownMenuItem  
