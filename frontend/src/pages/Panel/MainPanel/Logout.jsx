@@ -48,6 +48,7 @@ const Logout = () => {
                   localStorage.removeItem("email");
                   localStorage.removeItem("savedEmail");
                   localStorage.removeItem("savedPassword");
+                  localStorage.removeItem("id_project");
                   navigate("/");
                 }} className="py-3 px-[19px] gap-[12px] text-[14px] font-semibold"> <IconLogout variant='Bold'/>Logout</DropdownMenuItem>
             </DropdownMenuContent>

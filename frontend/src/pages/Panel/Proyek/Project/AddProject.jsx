@@ -27,12 +27,15 @@ import { Progress } from "@/components/ui/progress"
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { API_URL } from "../../../../helpers/networt";
 import axios from 'axios';
+import { useToast } from '@/hooks/use-toast'
+import { ToastAction } from "@/components/ui/toast"
 
 
 
-const AddProject = ({ className }) => {
+const AddProject = ({ className, fetchData }) => {
     const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
     const [isFolderVisible, setIsFolderVisible] = useState(false);
+    const { toast } = useToast()
 
     useEffect(() => {
         const handleResize = () => {
@@ -115,13 +118,227 @@ const AddProject = ({ className }) => {
 
     const handleVilagesChange = (value) => {
         setSelectedvillage(value);
-    
-      };
-    
+
+    };
+
 
     const [currentStep, setCurrentStep] = useState(0);
     const [ContentStep, setContentStep] = useState(0);
     const [progress, setProgress] = useState(50);
+
+
+    const [formData, setFormData] = useState({
+        nama_projec: '',
+        kategori: '',
+        deskripsi: '',
+        nama_pengaju_project: '',
+        jabatan: '',
+        instansi_organisasi: '',
+        no_telp: '',
+        alamat_lengkap: '',
+        provinsi: selectedProvince,
+        kabupaten_kota: selectedRegency,
+        kecamatan: selectedDistricts,
+        kelurahan_desa: selectedvillage,
+    });
+
+    const handleInputChange = (e) => {
+        const { id, value } = e.target;
+        setFormData({ ...formData, [id]: value });
+    };
+
+    const handleSelectChange = (value) => {
+        setFormData({ ...formData, kategori: value });
+    };
+
+    const handleSubmit = async () => {
+        const { nama_projec, kategori, deskripsi, nama_pengaju_project, jabatan, instansi_organisasi, no_telp, alamat_lengkap, provinsi, kabupaten_kota, kecamatan, kelurahan_desa, } = formData;
+        const token = localStorage.getItem("token");
+
+          // Validasi
+          if (!nama_projec) {
+            toast({
+                variant: "destructive",
+                title: "Error!",
+                description: "Nama project pengguna harus diisi.",
+                action: <ToastAction altText="Try again">Cancel</ToastAction>,
+            });
+            return;
+        }
+
+        if (!kategori) {
+            toast({
+                variant: "destructive",
+                title: "Error!",
+                description: "Kategori harus diisi.",
+                action: <ToastAction altText="Try again">Cancel</ToastAction>,
+            });
+            return;
+        }
+        
+        if (!deskripsi) {
+            toast({
+                variant: "destructive",
+                title: "Error!",
+                description: "Deskripsi harus diisi.",
+                action: <ToastAction altText="Try again">Cancel</ToastAction>,
+            });
+            return;
+        }
+        
+        if (!nama_pengaju_project) {
+            toast({
+                variant: "destructive",
+                title: "Error!",
+                description: "Nama pengaju project harus diisi.",
+                action: <ToastAction altText="Try again">Cancel</ToastAction>,
+            });
+            return;
+        }
+        
+        if (!jabatan) {
+            toast({
+                variant: "destructive",
+                title: "Error!",
+                description: "Jabatan harus diisi.",
+                action: <ToastAction altText="Try again">Cancel</ToastAction>,
+            });
+            return;
+        }
+        
+        if (!instansi_organisasi) {
+            toast({
+                variant: "destructive",
+                title: "Error!",
+                description: "Instansi/Organisasi harus diisi.",
+                action: <ToastAction altText="Try again">Cancel</ToastAction>,
+            });
+            return;
+        }
+        
+        if (!no_telp) {
+            toast({
+                variant: "destructive",
+                title: "Error!",
+                description: "Nomor telepon harus diisi.",
+                action: <ToastAction altText="Try again">Cancel</ToastAction>,
+            });
+            return;
+        }
+        
+        if (!alamat_lengkap) {
+            toast({
+                variant: "destructive",
+                title: "Error!",
+                description: "Alamat lengkap harus diisi.",
+                action: <ToastAction altText="Try again">Cancel</ToastAction>,
+            });
+            return;
+        }
+        
+        if (!selectedProvince) {
+            toast({
+                variant: "destructive",
+                title: "Error!",
+                description: "Provinsi harus diisi.",
+                action: <ToastAction altText="Try again">Cancel</ToastAction>,
+            });
+            return;
+        }
+        
+        if (!selectedRegency) {
+            toast({
+                variant: "destructive",
+                title: "Error!",
+                description: "Kabupaten/Kota harus diisi.",
+                action: <ToastAction altText="Try again">Cancel</ToastAction>,
+            });
+            return;
+        }
+        
+        if (!selectedDistricts) {
+            toast({
+                variant: "destructive",
+                title: "Error!",
+                description: "Kecamatan harus diisi.",
+                action: <ToastAction altText="Try again">Cancel</ToastAction>,
+            });
+            return;
+        }
+        
+        if (!selectedvillage) {
+            toast({
+                variant: "destructive",
+                title: "Error!",
+                description: "Kelurahan/Desa harus diisi.",
+                action: <ToastAction altText="Try again">Cancel</ToastAction>,
+            });
+            return;
+        }
+        
+        const form = new FormData();
+        form.append('nama_project', formData.nama_projec);
+        form.append('kategori', formData.kategori);
+        form.append('deskripsi', formData.deskripsi);
+        form.append('nama_pengaju_project', formData.nama_pengaju_project);
+        form.append('jabatan', formData.jabatan);
+        form.append('instansi_organisasi', formData.instansi_organisasi);
+        form.append('no_telp', formData.no_telp);
+        form.append('alamat_lengkap', formData.alamat_lengkap);
+        form.append('provinsi', selectedProvince);
+        form.append('kabupaten_kota', selectedRegency);
+        form.append('kecamatan', selectedDistricts);
+        form.append('kelurahan_desa', selectedvillage);
+
+        const id = localStorage.getItem("id");
+
+
+        try {
+            const response = await axios.post(`${API_URL}/api/projects`, form, {
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                }
+            });
+            const id_project = response.data.id_project;
+            console.log(id_project)
+            const logaktivitas = await axios.post(`${API_URL}/api/log-aktivitas`, {
+                id_project: id_project,
+                id_user: id,
+                aktivitas: "membuat folder",
+                keterangan: null
+            }, {
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                }
+            });
+            setContentStep(1);
+            fetchData();
+        } catch (error) {
+            console.error('Error adding user:', error);
+            if (error.response) {
+                // Server responded with a status other than 2xx
+                console.error('Response data:', error.response.data);
+                console.error('Response status:', error.response.status);
+                console.error('Response headers:', error.response.headers);
+            } else if (error.request) {
+                // Request was made but no response received
+                console.error('Request data:', error.request);
+            } else {
+                // Other errors (e.g., configuration issues)
+                console.error('Error message:', error.message);
+            }
+            toast({
+                variant: "destructive",
+                title: 'Error Adding User',
+                description: 'An internal server error occurred. Please try again later.',
+                status: 'error',
+                action: <ToastAction altText="Try again">Cancel</ToastAction>,
+            });
+        }
+    };
+
     return (
         <Dialog>
             <DialogTrigger asChild>
@@ -192,8 +409,11 @@ const AddProject = ({ className }) => {
                                         </div>
                                         <div className='lg:w-[68%] md:w-1/2 w-full px-4'>
                                             <Input
+                                                id="nama_projec"
                                                 placeholder="Nama Project"
                                                 className='h-[36px] text-[14px]'
+                                                value={formData.nama_projec}
+                                                onChange={handleInputChange}
                                             />
                                         </div>
                                     </div>
@@ -204,7 +424,7 @@ const AddProject = ({ className }) => {
                                             </div>
                                         </div>
                                         <div className='lg:w-[68%] md:w-1/2 w-full px-4'>
-                                            <Select>
+                                            <Select  onValueChange={handleSelectChange}>
                                                 <SelectTrigger className="w-full h-[36px] text-[14px]">
                                                     <SelectValue placeholder="Pilih kategori" />
                                                 </SelectTrigger>
@@ -228,8 +448,11 @@ const AddProject = ({ className }) => {
                                         </div>
                                         <div className='lg:w-[68%] md:w-1/2 w-full px-4'>
                                             <Textarea
+                                                id="deskripsi"
                                                 name="alamat"
                                                 className="w-full text-[14px]"
+                                                value={formData.deskripsi}
+                                                onChange={handleInputChange}
                                             />
                                             <p className='text-[14px] text-slate-500 font-medium flex justify-end'>0/200 char</p>
                                         </div>
@@ -246,8 +469,11 @@ const AddProject = ({ className }) => {
                                         </div>
                                         <div className='lg:w-[68%] md:w-1/2 w-full px-4'>
                                             <Input
+                                                id="nama_pengaju_project"
                                                 placeholder="Nama Pengaju Project"
                                                 className='h-[36px] text-[14px]'
+                                                value={formData.nama_pengaju_project}
+                                                onChange={handleInputChange}
                                             />
                                         </div>
                                     </div>
@@ -259,8 +485,11 @@ const AddProject = ({ className }) => {
                                         </div>
                                         <div className='lg:w-[68%] md:w-1/2 w-full px-4'>
                                             <Input
+                                                id="jabatan"
                                                 placeholder="Jabatan"
                                                 className='h-[36px] text-[14px]'
+                                                value={formData.jabatan}
+                                                onChange={handleInputChange}
                                             />
                                         </div>
                                     </div>
@@ -272,8 +501,11 @@ const AddProject = ({ className }) => {
                                         </div>
                                         <div className='lg:w-[68%] md:w-1/2 w-full px-4'>
                                             <Input
+                                                id="instansi_organisasi"
                                                 placeholder="Masukkan nama organisasi"
                                                 className='h-[36px] text-[14px]'
+                                                value={formData.instansi_organisasi}
+                                                onChange={handleInputChange}
                                             />
                                         </div>
                                     </div>
@@ -285,8 +517,11 @@ const AddProject = ({ className }) => {
                                         </div>
                                         <div className='lg:w-[68%] md:w-1/2 w-full px-4'>
                                             <Input
+                                                id="no_telp"
                                                 placeholder="Masukkan no. telp (WA)"
                                                 className='h-[36px] text-[14px]'
+                                                value={formData.no_telp}
+                                                onChange={handleInputChange}
                                             />
                                         </div>
                                     </div>
@@ -306,9 +541,12 @@ const AddProject = ({ className }) => {
                                         </div>
                                         <div className='lg:w-[68%] md:w-1/2 w-full px-4'>
                                             <Textarea
+                                                id="alamat_lengkap"
                                                 placeholder="Tulis alamat lengkap"
                                                 name="alamat"
                                                 className="w-full text-[14px]"
+                                                value={formData.alamat_lengkap}
+                                                onChange={handleInputChange}
                                             />
                                             <p className='text-[14px] text-slate-500 font-medium flex justify-end'>0/200 char</p>
                                         </div>
@@ -392,7 +630,7 @@ const AddProject = ({ className }) => {
                                             </div>
                                         </div>
                                         <div className='lg:w-[68%] md:w-1/2 w-full px-4'>
-                                            <Select onValueChange={handleVilagesChange}  disabled={!selectedDistricts} value={selectedvillage}>
+                                            <Select onValueChange={handleVilagesChange} disabled={!selectedDistricts} value={selectedvillage}>
                                                 <SelectTrigger className="w-full h-[36px] text-[14px]">
                                                     <SelectValue placeholder="Pilih Salah Satu" />
                                                 </SelectTrigger>
@@ -445,7 +683,7 @@ const AddProject = ({ className }) => {
                             {currentStep === 1 && (
                                 <DialogFooter>
                                     <Button onClick={() => setContentStep(1)} variant="secondary" type="submit" className=' h-[40px] text-[14px] '>Lewati</Button>
-                                    <Button onClick={() => setContentStep(1)} type="submit" className='bg-[#0036AA] h-[40px] text-[14px] hover:bg-[#2b4a8e]'>Simpan</Button>
+                                    <Button onClick={() => handleSubmit()} type="submit" className='bg-[#0036AA] h-[40px] text-[14px] hover:bg-[#2b4a8e]'>Simpan</Button>
                                 </DialogFooter>
                             )}
                         </>

@@ -152,12 +152,32 @@ const Project = () => {
         updateSelectedId(id);
     };
 
+    const handleArchive = async (id) =>{
+        const token = localStorage.getItem("token");
+        try {
+            await axios.put(
+                `${API_URL}/api/projects/${id}/archive?archive=Arsip`, 
+                {},
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                }
+            );
+      
+         fetchData();
+
+        } catch (error) {
+            console.error("Gagal archive:", error);
+        }
+    }
+
     return (
         <ScrollArea className="h-[92vh] w-full">
             <div className=' h-full w-full  px-[24px]'>
                 <div className='flex justify-between py-[24px]'>
                     <h1 className='text-[24px] font-medium'>Daftar Proyek</h1>
-                    <AddProject />
+                    <AddProject fetchData={fetchData}/>
                 </div>
                 <div className='py-[12px]'>
                     <div className='flex flex-wrap gap-4 justify-between items-center'>
@@ -235,7 +255,7 @@ const Project = () => {
                             <div className="flex flex-wrap -m-4">
                                 {filteredData.map((item) => (
                                     <div key={item.id} className="lg:w-1/4 md:w-1/2 p-4 w-1/2 ">
-                                        <div onClick={() => { navigate('/panel/proyek/detail'); handleClick(item.id); }} className='bg-white p-[16px] h-full rounded-[16px] grid gap-[23px] cursor-pointer'>
+                                        <div onClick={() => {  handleClick(item.id); }} className='bg-white p-[16px] h-full rounded-[16px] grid gap-[23px] '>
                                             <div className='flex justify-between items-center'>
                                                 <div className="relative inline-flex items-center justify-center">
                                                     <BsFolderFill
@@ -259,10 +279,10 @@ const Project = () => {
                                                         </Button>
                                                     </DropdownMenuTrigger>
                                                     <DropdownMenuContent align="start" className="w-[100px]">
-                                                        <DropdownMenuItem className="p-3 gap-3 text-[14px] font-medium">
+                                                        <DropdownMenuItem onClick={()=>{navigate('/panel/proyek/detail');  handleClick(item.id);  localStorage.setItem("id_project", item.id);}} className="p-3 gap-3 text-[14px] font-medium cursor-pointer">
                                                             View
                                                         </DropdownMenuItem>
-                                                        <DropdownMenuItem className="p-3 gap-3 text-[14px] font-medium ">
+                                                        <DropdownMenuItem onClick={() => handleArchive(item.id)} className="p-3 gap-3 text-[14px] font-medium cursor-pointer ">
                                                             Archive
                                                         </DropdownMenuItem>
                                                     </DropdownMenuContent>
@@ -301,7 +321,7 @@ const Project = () => {
                                     <h3 className='text-[16px] font-semibold'>Data proyek kosong</h3>
                                     <p className='text-[14px] text-[#717179]'>Tidak ada data proyek dihalaman ini</p>
                                 </div>
-                                <AddProject className='w-[286px]' />
+                                <AddProject fetchData={fetchData} className='w-[286px]' />
                             </div>
                         )}
                     </div>
