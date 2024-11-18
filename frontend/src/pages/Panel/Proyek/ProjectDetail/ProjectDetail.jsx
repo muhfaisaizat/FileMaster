@@ -92,7 +92,7 @@ const ProjectDetail = () => {
         <div className="flex flex-wrap -m-4">
           {isFolderVisible && (
             <div className="lg:w-[20%] md:w-1/2 w-full h-full">
-              <Folder />
+              <Folder fetchDatadetail={fetchData} />
             </div>
           )}
           <div className={`${isFolderVisible ? 'lg:w-[56%] border-l' : 'lg:w-[72%]'
