@@ -53,35 +53,45 @@ exports.getUserById = async (req, res) => {
 };
 
 exports.updateUser = async (req, res) => {
-  const { name, role, status } = req.body;
-  const user = await User.findByPk(req.params.id);
-  if (!user) return res.status(404).json({ error: 'User not found' });
-
-  // If a new image is uploaded, delete the old image from the images folder
-  if (req.file) {
-    // Construct path of the old image file
-    const oldImagePath = path.join(__dirname, '../images', user.image);
+  try {
+    const { name, role, status } = req.body;
+    const user = await User.findByPk(req.params.id);
     
-    // Check if the old image exists and remove it
-    fs.unlink(oldImagePath, (err) => {
-      if (err) {
-        console.error('Error deleting old image:', err);
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    // Handle image update
+    if (req.file) {
+      // Construct path of the old image file
+      if (user.image) {
+        const oldImagePath = path.join(__dirname, '../images', user.image);
+
+        // Check if the old image exists and remove it
+        fs.unlink(oldImagePath, (err) => {
+          if (err) {
+            console.error('Error deleting old image:', err);
+          }
+        });
       }
-    });
-    
-    // Generate the new image path
-    const imagePath = `PP_${req.body.name}_${req.file.originalname}`;
-    user.image = imagePath; // Update image path with the new image
+
+      // Generate the new image path and update it
+      const imagePath = `PP_${req.body.name}_${req.file.originalname}`;
+      user.image = imagePath; // Update image path with the new image
+    }
+
+    // Update user details
+    user.name = name || user.name;
+    user.role = role || user.role;
+    user.status = status || user.status;
+
+    await user.save();
+
+    res.json({ message: 'User updated successfully', user });
+  } catch (error) {
+    console.error('Error updating user:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
   }
-
-  // Update user details
-  user.name = name || user.name;
-  user.role = role || user.role;
-  user.status = status || user.status;
-
-  await user.save();
-
-  res.json({ message: 'User updated successfully', user });
 };
 
 exports.deleteUser = async (req, res) => {

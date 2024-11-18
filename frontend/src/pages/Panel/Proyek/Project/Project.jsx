@@ -1,4 +1,4 @@
-import React, { useState, useContext } from 'react'
+import React, { useState, useContext, useEffect } from 'react'
 import { Input } from '@/components/ui/input'
 import { SearchNormal1, Calendar as CalendarIcon, TickCircle } from 'iconsax-react';
 import { Button } from "@/components/ui/button"
@@ -34,6 +34,8 @@ import {
 } from "@/components/ui/select"
 import AddProject from './AddProject';
 import { SelectedIdContext } from './SelectIdProject';
+import { API_URL } from "../../../../helpers/networt";
+import axios from 'axios';
 
 const Project = () => {
     const navigate = useNavigate();
@@ -43,23 +45,80 @@ const Project = () => {
         { id: "m5gr84id", name: 'Persiapan Bangun' },
         { id: "m5gr84it", name: 'Izin Usaha' },
     ];
-    const Data = [
-        { id: 1, nama: 'PT Indomart - Gresik', kategori: 'Izin Bangun', date: '14 Oktober 2024', perusahaan: 'PT Indomaret', Aktivitas: '15 Oktober 2024', Progres: 'F1, F2, F3, F4' },
-        { id: 2, nama: 'PT Alfamart - Surabaya', kategori: 'SLF', date: '20 Oktober 2024', perusahaan: 'PT Alfamart', Aktivitas: '21 Oktober 2024', Progres: 'F2, F3' },
-        { id: 3, nama: 'PT Sumber Makmur - Jakarta', kategori: 'Persiapan Bangun', date: '18 Oktober 2024', perusahaan: 'PT Sumber Makmur', Aktivitas: '19 Oktober 2024', Progres: 'F1, F3, F4' },
-        { id: 4, nama: 'PT Tokopedia - Depok', kategori: 'Izin Usaha', date: '10 Oktober 2024', perusahaan: 'PT Tokopedia', Aktivitas: '11 Oktober 2024', Progres: 'F1, F4' },
-        { id: 5, nama: 'PT Bukalapak - Bogor', kategori: 'Izin Bangun', date: '22 Oktober 2024', perusahaan: 'PT Bukalapak', Aktivitas: '23 Oktober 2024', Progres: 'F1, F2, F3, F4' },
-        { id: 6, nama: 'PT Shopee - Bandung', kategori: 'SLF', date: '25 Oktober 2024', perusahaan: 'PT Shopee', Aktivitas: '26 Oktober 2024', Progres: 'F1, F2, F3, F4' },
-        { id: 7, nama: 'PT GoTo - Semarang', kategori: 'Persiapan Bangun', date: '15 Oktober 2024', perusahaan: 'PT GoTo', Aktivitas: '16 Oktober 2024', Progres: 'F2, F3' },
-        { id: 8, nama: 'PT Blibli - Yogyakarta', kategori: 'Izin Usaha', date: '5 Oktober 2024', perusahaan: 'PT Blibli', Aktivitas: '6 Oktober 2024', Progres: 'F1, F3, F4' },
-        { id: 9, nama: 'PT Unilever - Surabaya', kategori: 'Izin Bangun', date: '30 Oktober 2024', perusahaan: 'PT Unilever', Aktivitas: '31 Oktober 2024', Progres: 'F1, F2, F3, F4' },
-        { id: 10, nama: 'PT Nestle - Malang', kategori: 'SLF', date: '1 November 2024', perusahaan: 'PT Nestle', Aktivitas: '2 November 2024', Progres: 'F1, F2' },
-        { id: 11, nama: 'PT Danone - Bandung', kategori: 'Persiapan Bangun', date: '12 Oktober 2024', perusahaan: 'PT Danone', Aktivitas: '13 Oktober 2024', Progres: 'F1, F4' },
-        { id: 12, nama: 'PT Astra - Jakarta', kategori: 'Izin Usaha', date: '28 Oktober 2024', perusahaan: 'PT Astra', Aktivitas: '29 Oktober 2024', Progres: 'F2, F3, F4' },
-        { id: 13, nama: 'PT BCA - Tangerang', kategori: 'Izin Bangun', date: '8 Oktober 2024', perusahaan: 'PT BCA', Aktivitas: '9 Oktober 2024', Progres: 'F3' },
-        { id: 14, nama: 'PT Mandiri - Bali', kategori: 'SLF', date: '3 November 2024', perusahaan: 'PT Mandiri', Aktivitas: '4 November 2024', Progres: 'F1, F2, F3' },
-        { id: 15, nama: 'PT BNI - Medan', kategori: 'Persiapan Bangun', date: '6 Oktober 2024', perusahaan: 'PT BNI', Aktivitas: '7 Oktober 2024', Progres: 'F1, F2, F3, F4' },
-    ];
+    const [Data, setdata] = useState([
+        // { id: 1, nama: 'PT Indomart - Gresik', kategori: 'Izin Bangun', date: '14 Oktober 2024', perusahaan: 'PT Indomaret', Aktivitas: '15 Oktober 2024', Progres: 'F1, F2, F3, F4' },
+        // { id: 2, nama: 'PT Alfamart - Surabaya', kategori: 'SLF', date: '20 Oktober 2024', perusahaan: 'PT Alfamart', Aktivitas: '21 Oktober 2024', Progres: 'F2, F3' },
+        // { id: 3, nama: 'PT Sumber Makmur - Jakarta', kategori: 'Persiapan Bangun', date: '18 Oktober 2024', perusahaan: 'PT Sumber Makmur', Aktivitas: '19 Oktober 2024', Progres: 'F1, F3, F4' },
+        // { id: 4, nama: 'PT Tokopedia - Depok', kategori: 'Izin Usaha', date: '10 Oktober 2024', perusahaan: 'PT Tokopedia', Aktivitas: '11 Oktober 2024', Progres: 'F1, F4' },
+        // { id: 5, nama: 'PT Bukalapak - Bogor', kategori: 'Izin Bangun', date: '22 Oktober 2024', perusahaan: 'PT Bukalapak', Aktivitas: '23 Oktober 2024', Progres: 'F1, F2, F3, F4' },
+        // { id: 6, nama: 'PT Shopee - Bandung', kategori: 'SLF', date: '25 Oktober 2024', perusahaan: 'PT Shopee', Aktivitas: '26 Oktober 2024', Progres: 'F1, F2, F3, F4' },
+        // { id: 7, nama: 'PT GoTo - Semarang', kategori: 'Persiapan Bangun', date: '15 Oktober 2024', perusahaan: 'PT GoTo', Aktivitas: '16 Oktober 2024', Progres: 'F2, F3' },
+        // { id: 8, nama: 'PT Blibli - Yogyakarta', kategori: 'Izin Usaha', date: '5 Oktober 2024', perusahaan: 'PT Blibli', Aktivitas: '6 Oktober 2024', Progres: 'F1, F3, F4' },
+        // { id: 9, nama: 'PT Unilever - Surabaya', kategori: 'Izin Bangun', date: '30 Oktober 2024', perusahaan: 'PT Unilever', Aktivitas: '31 Oktober 2024', Progres: 'F1, F2, F3, F4' },
+        // { id: 10, nama: 'PT Nestle - Malang', kategori: 'SLF', date: '1 November 2024', perusahaan: 'PT Nestle', Aktivitas: '2 November 2024', Progres: 'F1, F2' },
+        // { id: 11, nama: 'PT Danone - Bandung', kategori: 'Persiapan Bangun', date: '12 Oktober 2024', perusahaan: 'PT Danone', Aktivitas: '13 Oktober 2024', Progres: 'F1, F4' },
+        // { id: 12, nama: 'PT Astra - Jakarta', kategori: 'Izin Usaha', date: '28 Oktober 2024', perusahaan: 'PT Astra', Aktivitas: '29 Oktober 2024', Progres: 'F2, F3, F4' },
+        // { id: 13, nama: 'PT BCA - Tangerang', kategori: 'Izin Bangun', date: '8 Oktober 2024', perusahaan: 'PT BCA', Aktivitas: '9 Oktober 2024', Progres: 'F3' },
+        // { id: 14, nama: 'PT Mandiri - Bali', kategori: 'SLF', date: '3 November 2024', perusahaan: 'PT Mandiri', Aktivitas: '4 November 2024', Progres: 'F1, F2, F3' },
+        // { id: 15, nama: 'PT BNI - Medan', kategori: 'Persiapan Bangun', date: '6 Oktober 2024', perusahaan: 'PT BNI', Aktivitas: '7 Oktober 2024', Progres: null },
+    ]);
+
+    const formatData = (apiData) => {
+        return {
+            id: apiData["ID"],  // Menambahkan "m" pada ID
+            nama: apiData["Nama Project"], // Mengakses "Nama Project" yang memiliki spasi
+            kategori: apiData["Kategori Project"], // Mengakses "Kategori Project"
+            deskripsi: apiData.Deskripsi,  // Mengakses Deskripsi
+            namaPengaju: apiData["Nama Pengaju"], // Mengakses "Nama Pengaju"
+            jabatan: apiData.Jabatan, // Mengakses Jabatan
+            perusahaan: apiData["Instansi/Organisasi"], // Mengakses "Instansi/Organisasi"
+            noTelp: apiData["No Telp"], // Mengakses "No Telp"
+            alamatLengkap: apiData["Alamat Lengkap"], // Mengakses "Alamat Lengkap"
+            provinsi: apiData.Provinsi, // Mengakses Provinsi
+            kabupatenKota: apiData["Kabupaten/Kota"], // Mengakses "Kabupaten/Kota"
+            kecamatan: apiData.Kecamatan, // Mengakses Kecamatan
+            kelurahanDesa: apiData["Kelurahan/Desa"], // Mengakses "Kelurahan/Desa"
+            archive: apiData.Archive,  // Mengakses Archive
+            date: new Date(apiData.Date).toLocaleDateString('id-ID', {  // Format tanggal "Date"
+                day: 'numeric', 
+                month: 'long', 
+                year: 'numeric' 
+            }),
+            Aktivitas: apiData.Aktivitas, // Mengakses Aktivitas
+            Progres: apiData.Progres // Mengakses Progres
+        };
+    };
+
+    const fetchData = async () => {
+        const token = localStorage.getItem("token");
+        try {
+            const response = await axios.get(`${API_URL}/api/projects`, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+
+           // Log untuk memastikan data yang diterima
+
+            // Pastikan response.data adalah array
+            if (Array.isArray(response.data)) {
+                const formattedData = response.data.map(formatData);
+               
+                setdata(formattedData);
+            } else {
+                console.error("Data yang diterima bukan array");
+            }
+        } catch (error) {
+            console.error("Error fetching data", error);
+        }
+    };
+    // Ambil data dari API
+    useEffect(() => {
+    
+        fetchData();
+    }, []);
+
+
     const [selectedFormats, setSelectedFormats] = useState([]);
     const [searchTerm, setSearchTerm] = useState('');
     const [date, setDate] = useState(null);
@@ -180,10 +239,10 @@ const Project = () => {
                                             <div className='flex justify-between items-center'>
                                                 <div className="relative inline-flex items-center justify-center">
                                                     <BsFolderFill
-                                                        color={checkProgresComplete(item.Progres) ? '#257DF9' : '#F0C74B'}
+                                                        color={item.Progres === null || !checkProgresComplete(item.Progres) ? '#F0C74B' : '#257DF9'}
                                                         size={32}
                                                     />
-                                                    {checkProgresComplete(item.Progres) && (
+                                                    {(item.Progres !== null && checkProgresComplete(item.Progres)) && (
                                                         <TickCircle
                                                             color="#FFFFFF"
                                                             variant="Bold"

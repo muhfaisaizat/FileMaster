@@ -29,7 +29,7 @@ import { ToastAction } from "@/components/ui/toast"
 import { API_URL } from "../../../helpers/networt";
 import axios from 'axios';
 
-const EditProfile = ({ isOpen, setIsOpen, selectedProductEdit }) => {
+const EditProfile = ({ isOpen, setIsOpen, selectedProductEdit, fetchData }) => {
     const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
 
     useEffect(() => {
@@ -78,6 +78,7 @@ const EditProfile = ({ isOpen, setIsOpen, selectedProductEdit }) => {
         // password: selectedProductEdit.nama,
         // confirmPassword: selectedProductEdit.nama,
         role: selectedProductEdit.role,
+         status: selectedProductEdit.status,
     });
 
     useEffect(() => {
@@ -123,7 +124,7 @@ const EditProfile = ({ isOpen, setIsOpen, selectedProductEdit }) => {
         // form.append('email', formData.email);
         // form.append('password', formData.password);
         form.append('role', formData.role);
-        form.append('status', formData.status);
+        form.append('status', selectedProductEdit.status);
         if (fileInputRef.current.files[0]) {
             form.append("image", fileInputRef.current.files[0]);
         }
@@ -192,6 +193,8 @@ const EditProfile = ({ isOpen, setIsOpen, selectedProductEdit }) => {
                 status: 'success',
                 action: <ToastAction altText="Try again">Cancel</ToastAction>,
             });
+
+            fetchData();
         } catch (error) {
             console.error('Error adding user:', error);
             if (error.response) {
@@ -207,6 +210,7 @@ const EditProfile = ({ isOpen, setIsOpen, selectedProductEdit }) => {
                 console.error('Error message:', error.message);
             }
             toast({
+                variant: "destructive",
                 title: 'Error Adding User',
                 description: 'An internal server error occurred. Please try again later.',
                 status: 'error',

@@ -29,7 +29,7 @@ import { ToastAction } from "@/components/ui/toast"
 import { API_URL } from "../../../helpers/networt";
 import axios from 'axios';
 
-const AddUser = ({className, buttonProps, textButton}) => {
+const AddUser = ({className, buttonProps, textButton , fetchData}) => {
     const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
 
     useEffect(() => {
@@ -173,6 +173,7 @@ const AddUser = ({className, buttonProps, textButton}) => {
                 status: 'success',
                 action: <ToastAction altText="Try again">Cancel</ToastAction>,
             });
+            fetchData();
         } catch (error) {
             console.error('Error adding user:', error);
             if (error.response) {
@@ -188,6 +189,7 @@ const AddUser = ({className, buttonProps, textButton}) => {
                 console.error('Error message:', error.message);
             }
             toast({
+                variant: "destructive",
                 title: 'Error Adding User',
                 description: 'An internal server error occurred. Please try again later.',
                 status: 'error',
