@@ -25,6 +25,8 @@ import {
 } from "@/components/ui/select"
 import { FiEdit2 } from "react-icons/fi";
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { API_URL } from "../../../../helpers/networt";
+import axios from 'axios';
 
 
 const indonesiaData = {
@@ -39,34 +41,59 @@ const indonesiaData = {
 };
 
 
-const InformasiProyek = () => {
+const InformasiProyek = ({ Data, fetchData, fetchDataLOG }) => {
   const [currentStep, setCurrentStep] = useState(0);
   const [ContentStep, setContentStep] = useState(0);
   const [isEditingDetail, setIsEditingDetail] = useState(false);
   const [isEditingInfo, setIsEditingInfo] = useState(false);
   const [isEditingLokasi, setIsEditingLokasi] = useState(false);
-  const [selectedCategory, setSelectedCategory] = useState("Persiapan Bangun");
-  const [nama, setnama] = useState("Persiapan Bangun PT Indomaret")
-  const [deskripsi, setdeskripsi] = useState("Penjelasan deskripsi proyek singkat")
-  const [pengaju, setpengaju] = useState("Nurmaningtiyas")
-  const [jabatan, setjabatan] = useState("Manager")
-  const [pt, setpt] = useState("PT Indomaret")
-  const [nomor, setnomor] = useState("089230493210")
-  const [alamat, setalamat] = useState("Jl langka, dusun baru Keramik merah")
-  const [provinsi, setprovinsi] = useState("Provinsi A")
-  const [kab, setkab] = useState("Kabupaten A2")
-  const [kec, setkec] = useState("Kecamatan A2")
-  const [desa, setdesa] = useState("Desa1")
+  const [selectedCategory, setSelectedCategory] = useState('');
+  const [nama, setnama] = useState('')
+  const [deskripsi, setdeskripsi] = useState('')
+  const [pengaju, setpengaju] = useState('')
+  const [jabatan, setjabatan] = useState('')
+  const [pt, setpt] = useState('')
+  const [nomor, setnomor] = useState('')
+  const [alamat, setalamat] = useState('')
+  // const [provinsi, setprovinsi] = useState("Provinsi A")
+  // const [kab, setkab] = useState("Kabupaten A2")
+  // const [kec, setkec] = useState("Kecamatan A2")
+  // const [desa, setdesa] = useState("Desa1")
 
 
   const [provinces, setProvinces] = useState([]);
-  const [selectedProvince, setSelectedProvince] = useState('35');
+  const [selectedProvince, setSelectedProvince] = useState('');
   const [regencies, setRegencies] = useState([]);
-  const [selectedRegency, setSelectedRegency] = useState('3573');
+  const [selectedRegency, setSelectedRegency] = useState('');
   const [subDistricts, setSubDistricts] = useState([]);
-  const [selectedDistricts, setSelectedDistricts] = useState('3573050');
+  const [selectedDistricts, setSelectedDistricts] = useState('');
   const [subvillages, setsubvillages] = useState([]);
-  const [selectedvillage, setSelectedvillage] = useState('3573050006');
+  const [selectedvillage, setSelectedvillage] = useState('');
+
+
+  // Fungsi untuk reset nilai dari Data
+  const resetForm = () => {
+    if (Data) {
+      setSelectedCategory(Data.kategori || "");
+      setnama(Data.nama || "");
+      setdeskripsi(Data.deskripsi || "");
+      setpengaju(Data.namaPengaju || "");
+      setjabatan(Data.jabatan || "");
+      setpt(Data.perusahaan || "");
+      setnomor(Data.noTelp || "");
+      setalamat(Data.alamatLengkap || "");
+      setSelectedProvince(Data.provinsi || "");
+      setSelectedRegency(Data.kabupatenKota || "");
+      setSelectedDistricts(Data.kecamatan || "");
+      setSelectedvillage(Data.kelurahanDesa || "");
+    }
+  };
+
+  // Perbarui form saat Data berubah
+  useEffect(() => {
+    resetForm();
+  }, [Data]);
+
 
   // Fetch provinces when the component mounts
   useEffect(() => {
@@ -139,15 +166,84 @@ const InformasiProyek = () => {
   //   setSubDistricts(indonesiaData[selectedProvince][kab] || []);
   // }, [selectedProvince, kab]);
 
+  const edit = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      const id = localStorage.getItem("id_project");
+      const iduser = localStorage.getItem("id");
+
+      // console.log(id, iduser, API_URL)
+
+      const formDataedit = {
+        nama_project: nama,
+        kategori: selectedCategory,
+        deskripsi: deskripsi,
+        nama_pengaju_project: pengaju,
+        jabatan: jabatan,
+        instansi_organisasi: pt,
+        no_telp: nomor,
+        alamat_lengkap: alamat,
+        provinsi: selectedProvince,
+        kabupaten_kota: selectedRegency,
+        kecamatan: selectedDistricts,
+        kelurahan_desa: selectedvillage
+      };      
+
+      // Jika uploadedFile sudah ada, lakukan PUT untuk update
+      await axios.put(`${API_URL}/api/projects/${id}`, formDataedit, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        }
+      });
+
+      await axios.post(`${API_URL}/api/log-aktivitas`, {
+        id_project: id,
+        id_user: iduser,
+        aktivitas: "mengedit folder",
+        keterangan: "Informasi Proyek"
+      }, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+
+      fetchData();
+      fetchDataLOG();
+    } catch (error) {
+      console.error("Error while editing project:", error.response || error.message);
+    }
+  }
+
   const handleEditDetailClick = () => {
+    edit();
     setIsEditingDetail(!isEditingDetail);
   };
+
+  const handleBatalDetail = () => {
+    resetForm();
+    setIsEditingDetail(!isEditingDetail);
+  }
   const handleEditInfoClick = () => {
+    edit();
     setIsEditingInfo(!isEditingInfo);
   };
+
+  const handleBatalInfo = () => {
+    resetForm();
+    setIsEditingInfo(!isEditingInfo);
+  }
+
   const handleEditLokasiClick = () => {
+    edit();
     setIsEditingLokasi(!isEditingLokasi);
   };
+
+  const handleBatalLokasi = () => {
+    resetForm();
+    setIsEditingLokasi(!isEditingLokasi);
+  }
 
   // const handleProvinceChange = (province) => {
   //   setSelectedProvince(province);
@@ -177,10 +273,37 @@ const InformasiProyek = () => {
   const handleSelectChange = (value) => {
     setSelectedCategory(value);
   };
+
+
+  const log = async ()=>{
+    try {
+      const token = localStorage.getItem("token");
+      const id = localStorage.getItem("id_project");
+      const iduser = localStorage.getItem("id");
+
+      await axios.post(`${API_URL}/api/log-aktivitas`, {
+        id_project: id,
+        id_user: iduser,
+        aktivitas: "melihat folder",
+        keterangan: "Informasi Proyek"
+      }, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+
+      fetchDataLOG();
+
+    } catch (error) {
+      console.error("Error log:", error.response || error.message);
+    }
+  }
+
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button variant="secondary" className=' flex items-center  p-[12px] rounded-[6px] gap-[8px]' > <InfoCircle size="14" />
+        <Button onClick={log} variant="secondary" className=' flex items-center  p-[12px] rounded-[6px] gap-[8px]' > <InfoCircle size="14" />
           <p className='text-[14px] font-medium'>Informasi Proyek</p></Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[820px] p-[24px]">
@@ -290,7 +413,7 @@ const InformasiProyek = () => {
             </div>
             {isEditingDetail && (
               <div className='flex justify-end gap-[8px]'>
-                <Button onClick={handleEditDetailClick} variant='secondary' className='text-[14px] h-[36px]'>
+                <Button onClick={handleBatalDetail} variant='secondary' className='text-[14px] h-[36px]'>
                   Batal
                 </Button>
                 <Button onClick={handleEditDetailClick} className='bg-[#0036AA] h-[36px] text-[14px] hover:bg-[#2b4a8e]'>
@@ -392,7 +515,7 @@ const InformasiProyek = () => {
             </div>
             {isEditingInfo && (
               <div className='flex justify-end gap-[8px]'>
-                <Button onClick={handleEditInfoClick} variant='secondary' className='text-[14px] h-[36px]'>
+                <Button onClick={handleBatalInfo} variant='secondary' className='text-[14px] h-[36px]'>
                   Batal
                 </Button>
                 <Button onClick={handleEditInfoClick} className='bg-[#0036AA] h-[36px] text-[14px] hover:bg-[#2b4a8e]'>
@@ -471,7 +594,7 @@ const InformasiProyek = () => {
                     </div>
                   </div>
                   <div className='lg:w-[68%] md:w-1/2 w-full px-4'>
-                  {regencies
+                    {regencies
                       .filter((province) => province.id === selectedRegency)
                       .map((province) => (
                         <p className='text-[14px]' key={province.id} value={province.id}>
@@ -487,7 +610,7 @@ const InformasiProyek = () => {
                     </div>
                   </div>
                   <div className='lg:w-[68%] md:w-1/2 w-full px-4'>
-                  {subDistricts
+                    {subDistricts
                       .filter((province) => province.id === selectedDistricts)
                       .map((province) => (
                         <p className='text-[14px]' key={province.id} value={province.id}>
@@ -503,7 +626,7 @@ const InformasiProyek = () => {
                     </div>
                   </div>
                   <div className='lg:w-[68%] md:w-1/2 w-full px-4'>
-                  {subvillages
+                    {subvillages
                       .filter((province) => province.id === selectedvillage)
                       .map((province) => (
                         <p className='text-[14px]' key={province.id} value={province.id}>
@@ -595,7 +718,7 @@ const InformasiProyek = () => {
                     </div>
                   </div>
                   <div className='lg:w-[68%] md:w-1/2 w-full px-4'>
-                    <Select  onValueChange={handleVilagesChange} disabled={!selectedDistricts} value={selectedvillage}>
+                    <Select onValueChange={handleVilagesChange} disabled={!selectedDistricts} value={selectedvillage}>
                       <SelectTrigger className="w-full h-[36px] text-[14px]">
                         <SelectValue placeholder="Pilih Salah Satu" />
                       </SelectTrigger>
@@ -614,7 +737,7 @@ const InformasiProyek = () => {
                 </div>
                 {isEditingLokasi && (
                   <div className='flex justify-end gap-[8px]'>
-                    <Button onClick={handleEditLokasiClick} variant='secondary' className='text-[14px] h-[36px]'>
+                    <Button onClick={handleBatalLokasi} variant='secondary' className='text-[14px] h-[36px]'>
                       Batal
                     </Button>
                     <Button onClick={handleEditLokasiClick} className='bg-[#0036AA] h-[36px] text-[14px] hover:bg-[#2b4a8e]'>

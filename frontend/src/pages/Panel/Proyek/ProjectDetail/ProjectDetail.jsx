@@ -267,6 +267,7 @@ useEffect(() => {
               setDataFileUtama={setDataFileUtama}
               fetchDataUtama={fetchDataUtama}
               setUploadedFile={setUploadedFile}
+              fetchData={fetchData}
             />
           </div>
           <div className={`${isFolderVisible ? 'lg:w-[24%]' : 'lg:w-[28%]'

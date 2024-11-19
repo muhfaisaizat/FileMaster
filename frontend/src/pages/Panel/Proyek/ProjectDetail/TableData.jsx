@@ -9,7 +9,7 @@ import FilePendukung from './FilePendukung';
 import InformasiProyek from './InformasiProyek';
 import LogActivity from './LogActivity';
 
-const TableData = ({uploadedFile, uploadedFileF2, uploadedFileF3, uploadedFileF4, lengF, Data, activities, fetchDataLOG, DataFileUtama , setDataFileUtama, fetchDataUtama, setUploadedFile}) => {
+const TableData = ({uploadedFile, uploadedFileF2, uploadedFileF3, uploadedFileF4, lengF, Data, activities, fetchDataLOG, DataFileUtama , setDataFileUtama, fetchDataUtama, setUploadedFile, fetchData}) => {
     const [activeTab, setActiveTab] = useState("Direktori");
     const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
 
@@ -38,7 +38,7 @@ const TableData = ({uploadedFile, uploadedFileF2, uploadedFileF3, uploadedFileF4
                         <p className='text-[14px] font-medium text-[#717179]'>{Data.kategori || 'kategori tidak tersedia'}</p>
                     </div>
                     <div className=' grid items-center '>
-                      <InformasiProyek/>
+                      <InformasiProyek Data={Data} fetchData={fetchData} fetchDataLOG={fetchDataLOG}/>
                     </div>
                 </div>
                 <div className='border p-[16px] rounded-[8px] grid gap-[16px]'>
