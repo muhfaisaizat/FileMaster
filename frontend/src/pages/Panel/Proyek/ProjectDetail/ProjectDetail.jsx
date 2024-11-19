@@ -156,6 +156,16 @@ const fetchDataUtama = async () => {
         // Pastikan response.data adalah array
         if (Array.isArray(response.data)) {
           const filteredData = response.data.filter(item => item.pekerjaan === "F1");
+          const filteredDataF2 = response.data.filter(item => item.pekerjaan === "F2");
+          const filteredDataF3pdf = response.data.filter(item => item.other_file === "Form F3.pdf");
+          const filteredDataF3docx = response.data.filter(item => item.other_file === "Form F3.docx");
+          const filteredDataF4gambar = response.data.filter(item => item.other_file === "Gambar.pdf");
+          const filteredDataF4analisa = response.data.filter(item => item.other_file === "Analisa Struktur.pdf");
+          const filteredDataF4spek = response.data.filter(item => item.other_file === "Spek Teknis.pdf");
+          const filteredDataF4airhujan = response.data.filter(item => item.other_file === "Perhitungan Air Hujan.pdf");
+          const filteredDataF4airbersih = response.data.filter(item => item.other_file === "Perhitungan Air Bersih.pdf");
+          const filteredDataF4airkotor = response.data.filter(item => item.other_file === "Perhitungan Air Kotor.pdf");
+          const filteredDataF4slf = response.data.filter(item => item.other_file === "Kajian dan Simak (SLF).pdf");
           // console.log(filteredData)
             const formattedData = response.data.map(formatDataUtama);
             setDataFileUtama(formattedData);
@@ -163,6 +173,56 @@ const fetchDataUtama = async () => {
               setUploadedFile(filteredData);
           } else{
             setUploadedFile(null);
+          }
+            if (filteredDataF2.length > 0) {
+              setUploadedFileF2(filteredDataF2);
+          } else{
+            setUploadedFileF2(null);
+          }
+            if (filteredDataF3pdf.length > 0) {
+              setUploadedFileF3pdf(filteredDataF3pdf);
+          } else{
+            setUploadedFileF3pdf(null);
+          }
+            if (filteredDataF3docx.length > 0) {
+              setUploadedFileF3docx(filteredDataF3docx);
+          } else{
+            setUploadedFileF3docx(null);
+          }
+            if (filteredDataF4gambar.length > 0) {
+              setUploadedFileF4gambar(filteredDataF4gambar);
+          } else{
+            setUploadedFileF4gambar(null);
+          }
+            if (filteredDataF4analisa.length > 0) {
+              setUploadedFileF4analisa(filteredDataF4analisa);
+          } else{
+            setUploadedFileF4analisa(null);
+          }
+            if (filteredDataF4spek.length > 0) {
+              setUploadedFileF4spek(filteredDataF4spek);
+          } else{
+            setUploadedFileF4spek(null);
+          }
+            if (filteredDataF4airhujan.length > 0) {
+              setUploadedFileF4airhujan(filteredDataF4airhujan);
+          } else{
+            setUploadedFileF4airhujan(null);
+          }
+            if (filteredDataF4airbersih.length > 0) {
+              setUploadedFileF4airbersih(filteredDataF4airbersih);
+          } else{
+            setUploadedFileF4airbersih(null);
+          }
+            if (filteredDataF4airkotor.length > 0) {
+              setUploadedFileF4airkotor(filteredDataF4airkotor);
+          } else{
+            setUploadedFileF4airkotor(null);
+          }
+            if (filteredDataF4slf.length > 0) {
+              setUploadedFileF4SLF(filteredDataF4slf);
+          } else{
+            setUploadedFileF4SLF(null);
           }
         } else {
             console.error("Data yang diterima bukan array");

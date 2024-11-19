@@ -87,101 +87,701 @@ const Form = ({ uploadedFile, setUploadedFile, uploadedFileF2, setUploadedFileF2
         }
     };
 
-    const handleFileChangeF2 = (event) => {
+    const handleFileChangeF2 = async (event) => {
         const file = event.target.files[0];
         if (file && file.type === "application/pdf") {
             const renamedFile = new File([file], "Informasi Pekerjaan.pdf", { type: file.type });
             setUploadedFileF2(renamedFile);
+            try {
+                const token = localStorage.getItem("token");
+                const id = localStorage.getItem("id_project");
+                const iduser = localStorage.getItem("id");
+
+                if (uploadedFileF2) {
+                    const formDataedit = new FormData();
+                    formDataedit.append('file', renamedFile);
+                    formDataedit.append('oldFileName', uploadedFileF2[0].file);
+                    // Jika uploadedFile sudah ada, lakukan PUT untuk update
+                    await axios.put(`${API_URL}/api/detail-project-utama/${uploadedFileF2[0].id_project_utama}`, formDataedit, {
+                        headers: {
+                            'Authorization': `Bearer ${token}`,
+                        }
+                    });
+
+                    await axios.post(`${API_URL}/api/log-aktivitas`, {
+                        id_project: id,
+                        id_user: iduser,
+                        aktivitas: "mengganti file",
+                        keterangan: "Informasi Pekerjaan"
+                    }, {
+                        headers: {
+                            'Authorization': `Bearer ${token}`,
+                            'Content-Type': 'application/json'
+                        }
+                    });
+
+                } else {
+                    const formData = new FormData();
+                    formData.append('id_project', id);
+                    formData.append('pekerjaan', 'F2');
+                    formData.append('other_file', 'Informasi Pekerjaan.pdf');
+                    formData.append('file', renamedFile);
+                    // Jika belum ada file, lakukan POST untuk upload
+                    await axios.post(`${API_URL}/api/detail-project-utama`, formData, {
+                        headers: {
+                            'Authorization': `Bearer ${token}`,
+                        }
+                    });
+
+                    await axios.post(`${API_URL}/api/log-aktivitas`, {
+                        id_project: id,
+                        id_user: iduser,
+                        aktivitas: "mengupload file",
+                        keterangan: "Informasi Pekerjaan"
+                    }, {
+                        headers: {
+                            'Authorization': `Bearer ${token}`,
+                            'Content-Type': 'application/json'
+                        }
+                    });
+                }
+
+                // Jika diperlukan, panggil fungsi untuk memperbarui data
+                fetchDataUtama();
+                fetchDataLOG();
+            } catch (error) {
+                console.log("F2", error);
+            }
         } else {
             alert("Harap unggah file PDF.");
         }
     };
 
-    const handleFileChangeF3pdf = (event) => {
+    const handleFileChangeF3pdf = async (event) => {
         const file = event.target.files[0];
         if (file && file.type === "application/pdf") {
             const renamedFile = new File([file], "Form F3.pdf", { type: file.type });
             setUploadedFileF3pdf(renamedFile);
+            try {
+                const token = localStorage.getItem("token");
+                const id = localStorage.getItem("id_project");
+                const iduser = localStorage.getItem("id");
+
+                if (uploadedFileF3pdf) {
+                    const formDataedit = new FormData();
+                    formDataedit.append('file', renamedFile);
+                    formDataedit.append('oldFileName', uploadedFileF3pdf[0].file);
+                    // Jika uploadedFile sudah ada, lakukan PUT untuk update
+                    await axios.put(`${API_URL}/api/detail-project-utama/${uploadedFileF3pdf[0].id_project_utama}`, formDataedit, {
+                        headers: {
+                            'Authorization': `Bearer ${token}`,
+                        }
+                    });
+
+                    await axios.post(`${API_URL}/api/log-aktivitas`, {
+                        id_project: id,
+                        id_user: iduser,
+                        aktivitas: "mengganti file",
+                        keterangan: "Form F3 - PDF"
+                    }, {
+                        headers: {
+                            'Authorization': `Bearer ${token}`,
+                            'Content-Type': 'application/json'
+                        }
+                    });
+
+                } else {
+                    const formData = new FormData();
+                    formData.append('id_project', id);
+                    formData.append('pekerjaan', 'F3');
+                    formData.append('other_file', 'Form F3.pdf');
+                    formData.append('file', renamedFile);
+                    // Jika belum ada file, lakukan POST untuk upload
+                    await axios.post(`${API_URL}/api/detail-project-utama`, formData, {
+                        headers: {
+                            'Authorization': `Bearer ${token}`,
+                        }
+                    });
+
+                    await axios.post(`${API_URL}/api/log-aktivitas`, {
+                        id_project: id,
+                        id_user: iduser,
+                        aktivitas: "mengupload file",
+                        keterangan: "Form F3 - PDF"
+                    }, {
+                        headers: {
+                            'Authorization': `Bearer ${token}`,
+                            'Content-Type': 'application/json'
+                        }
+                    });
+                }
+
+                // Jika diperlukan, panggil fungsi untuk memperbarui data
+                fetchDataUtama();
+                fetchDataLOG();
+            } catch (error) {
+                console.log("F3pdf", error);
+            }
         } else {
             alert("Harap unggah file PDF.");
         }
     };
 
-    const handleFileChangeF3docx = (event) => {
+    const handleFileChangeF3docx = async(event) => {
         const file = event.target.files[0];
         if (file && file.type === "application/vnd.openxmlformats-officedocument.wordprocessingml.document") {
             const renamedFile = new File([file], "Form F3.docx", { type: file.type });
             setUploadedFileF3docx(renamedFile);
+            try {
+                const token = localStorage.getItem("token");
+                const id = localStorage.getItem("id_project");
+                const iduser = localStorage.getItem("id");
+
+                if (uploadedFileF3docx) {
+                    const formDataedit = new FormData();
+                    formDataedit.append('file', renamedFile);
+                    formDataedit.append('oldFileName', uploadedFileF3docx[0].file);
+                    // Jika uploadedFile sudah ada, lakukan PUT untuk update
+                    await axios.put(`${API_URL}/api/detail-project-utama/${uploadedFileF3docx[0].id_project_utama}`, formDataedit, {
+                        headers: {
+                            'Authorization': `Bearer ${token}`,
+                        }
+                    });
+
+                    await axios.post(`${API_URL}/api/log-aktivitas`, {
+                        id_project: id,
+                        id_user: iduser,
+                        aktivitas: "mengganti file",
+                        keterangan: "Form F3 - DOCX"
+                    }, {
+                        headers: {
+                            'Authorization': `Bearer ${token}`,
+                            'Content-Type': 'application/json'
+                        }
+                    });
+
+                } else {
+                    const formData = new FormData();
+                    formData.append('id_project', id);
+                    formData.append('pekerjaan', 'F3');
+                    formData.append('other_file', 'Form F3.docx');
+                    formData.append('file', renamedFile);
+                    // Jika belum ada file, lakukan POST untuk upload
+                    await axios.post(`${API_URL}/api/detail-project-utama`, formData, {
+                        headers: {
+                            'Authorization': `Bearer ${token}`,
+                        }
+                    });
+
+                    await axios.post(`${API_URL}/api/log-aktivitas`, {
+                        id_project: id,
+                        id_user: iduser,
+                        aktivitas: "mengupload file",
+                        keterangan: "Form F3 - DOCX"
+                    }, {
+                        headers: {
+                            'Authorization': `Bearer ${token}`,
+                            'Content-Type': 'application/json'
+                        }
+                    });
+                }
+
+                // Jika diperlukan, panggil fungsi untuk memperbarui data
+                fetchDataUtama();
+                fetchDataLOG();
+            } catch (error) {
+                console.log("F3docx", error);
+            }
         } else {
             alert("Harap unggah file DOCX.");
         }
     };
 
-    const handleFileChangeF4gambar = (event) => {
+    const handleFileChangeF4gambar = async (event) => {
         const file = event.target.files[0];
         if (file && file.type === "application/pdf") {
             const renamedFile = new File([file], "Gambar.pdf", { type: file.type });
             setUploadedFileF4gambar(renamedFile);
+            try {
+                const token = localStorage.getItem("token");
+                const id = localStorage.getItem("id_project");
+                const iduser = localStorage.getItem("id");
+
+                if (uploadedFileF4gambar) {
+                    const formDataedit = new FormData();
+                    formDataedit.append('file', renamedFile);
+                    formDataedit.append('oldFileName', uploadedFileF4gambar[0].file);
+                    // Jika uploadedFile sudah ada, lakukan PUT untuk update
+                    await axios.put(`${API_URL}/api/detail-project-utama/${uploadedFileF4gambar[0].id_project_utama}`, formDataedit, {
+                        headers: {
+                            'Authorization': `Bearer ${token}`,
+                        }
+                    });
+
+                    await axios.post(`${API_URL}/api/log-aktivitas`, {
+                        id_project: id,
+                        id_user: iduser,
+                        aktivitas: "mengganti file",
+                        keterangan: "Form F4 - Gambar"
+                    }, {
+                        headers: {
+                            'Authorization': `Bearer ${token}`,
+                            'Content-Type': 'application/json'
+                        }
+                    });
+
+                } else {
+                    const formData = new FormData();
+                    formData.append('id_project', id);
+                    formData.append('pekerjaan', 'F4');
+                    formData.append('other_file', 'Gambar.pdf');
+                    formData.append('file', renamedFile);
+                    // Jika belum ada file, lakukan POST untuk upload
+                    await axios.post(`${API_URL}/api/detail-project-utama`, formData, {
+                        headers: {
+                            'Authorization': `Bearer ${token}`,
+                        }
+                    });
+
+                    await axios.post(`${API_URL}/api/log-aktivitas`, {
+                        id_project: id,
+                        id_user: iduser,
+                        aktivitas: "mengupload file",
+                        keterangan: "Form F4 - Gambar"
+                    }, {
+                        headers: {
+                            'Authorization': `Bearer ${token}`,
+                            'Content-Type': 'application/json'
+                        }
+                    });
+                }
+
+                // Jika diperlukan, panggil fungsi untuk memperbarui data
+                fetchDataUtama();
+                fetchDataLOG();
+            } catch (error) {
+                console.log("F4gambar", error);
+            }
         } else {
             alert("Harap unggah file PDF.");
         }
     };
 
-    const handleFileChangeF4analisa = (event) => {
+    const handleFileChangeF4analisa = async (event) => {
         const file = event.target.files[0];
         if (file && file.type === "application/pdf") {
             const renamedFile = new File([file], "Analisa Struktur.pdf", { type: file.type });
             setUploadedFileF4analisa(renamedFile);
+            try {
+                const token = localStorage.getItem("token");
+                const id = localStorage.getItem("id_project");
+                const iduser = localStorage.getItem("id");
+
+                if (uploadedFileF4analisa) {
+                    const formDataedit = new FormData();
+                    formDataedit.append('file', renamedFile);
+                    formDataedit.append('oldFileName', uploadedFileF4analisa[0].file);
+                    // Jika uploadedFile sudah ada, lakukan PUT untuk update
+                    await axios.put(`${API_URL}/api/detail-project-utama/${uploadedFileF4analisa[0].id_project_utama}`, formDataedit, {
+                        headers: {
+                            'Authorization': `Bearer ${token}`,
+                        }
+                    });
+
+                    await axios.post(`${API_URL}/api/log-aktivitas`, {
+                        id_project: id,
+                        id_user: iduser,
+                        aktivitas: "mengganti file",
+                        keterangan: "Form F4 - Analisa Struktur"
+                    }, {
+                        headers: {
+                            'Authorization': `Bearer ${token}`,
+                            'Content-Type': 'application/json'
+                        }
+                    });
+
+                } else {
+                    const formData = new FormData();
+                    formData.append('id_project', id);
+                    formData.append('pekerjaan', 'F4');
+                    formData.append('other_file', 'Analisa Struktur.pdf');
+                    formData.append('file', renamedFile);
+                    // Jika belum ada file, lakukan POST untuk upload
+                    await axios.post(`${API_URL}/api/detail-project-utama`, formData, {
+                        headers: {
+                            'Authorization': `Bearer ${token}`,
+                        }
+                    });
+
+                    await axios.post(`${API_URL}/api/log-aktivitas`, {
+                        id_project: id,
+                        id_user: iduser,
+                        aktivitas: "mengupload file",
+                        keterangan: "Form F4 - Analisa Struktur"
+                    }, {
+                        headers: {
+                            'Authorization': `Bearer ${token}`,
+                            'Content-Type': 'application/json'
+                        }
+                    });
+                }
+
+                // Jika diperlukan, panggil fungsi untuk memperbarui data
+                fetchDataUtama();
+                fetchDataLOG();
+            } catch (error) {
+                console.log("F4analisa", error);
+            }
         } else {
             alert("Harap unggah file PDF.");
         }
     };
 
-    const handleFileChangeF4spek = (event) => {
+    const handleFileChangeF4spek = async (event) => {
         const file = event.target.files[0];
         if (file && file.type === "application/pdf") {
-            const renamedFile = new File([file], "Spek teknis.pdf", { type: file.type });
+            const renamedFile = new File([file], "Spek Teknis.pdf", { type: file.type });
             setUploadedFileF4spek(renamedFile);
+            try {
+                const token = localStorage.getItem("token");
+                const id = localStorage.getItem("id_project");
+                const iduser = localStorage.getItem("id");
+
+                if (uploadedFileF4spek) {
+                    const formDataedit = new FormData();
+                    formDataedit.append('file', renamedFile);
+                    formDataedit.append('oldFileName', uploadedFileF4spek[0].file);
+                    // Jika uploadedFile sudah ada, lakukan PUT untuk update
+                    await axios.put(`${API_URL}/api/detail-project-utama/${uploadedFileF4spek[0].id_project_utama}`, formDataedit, {
+                        headers: {
+                            'Authorization': `Bearer ${token}`,
+                        }
+                    });
+
+                    await axios.post(`${API_URL}/api/log-aktivitas`, {
+                        id_project: id,
+                        id_user: iduser,
+                        aktivitas: "mengganti file",
+                        keterangan: "Form F4 - Spek Teknis"
+                    }, {
+                        headers: {
+                            'Authorization': `Bearer ${token}`,
+                            'Content-Type': 'application/json'
+                        }
+                    });
+
+                } else {
+                    const formData = new FormData();
+                    formData.append('id_project', id);
+                    formData.append('pekerjaan', 'F4');
+                    formData.append('other_file', 'Spek Teknis.pdf');
+                    formData.append('file', renamedFile);
+                    // Jika belum ada file, lakukan POST untuk upload
+                    await axios.post(`${API_URL}/api/detail-project-utama`, formData, {
+                        headers: {
+                            'Authorization': `Bearer ${token}`,
+                        }
+                    });
+
+                    await axios.post(`${API_URL}/api/log-aktivitas`, {
+                        id_project: id,
+                        id_user: iduser,
+                        aktivitas: "mengupload file",
+                        keterangan: "Form F4 - Spek Teknis"
+                    }, {
+                        headers: {
+                            'Authorization': `Bearer ${token}`,
+                            'Content-Type': 'application/json'
+                        }
+                    });
+                }
+
+                // Jika diperlukan, panggil fungsi untuk memperbarui data
+                fetchDataUtama();
+                fetchDataLOG();
+            } catch (error) {
+                console.log("F4spek", error);
+            }
         } else {
             alert("Harap unggah file PDF.");
         }
     };
 
-    const handleFileChangeF4airhujan = (event) => {
+    const handleFileChangeF4airhujan = async (event) => {
         const file = event.target.files[0];
         if (file && file.type === "application/pdf") {
             const renamedFile = new File([file], "Perhitungan Air Hujan.pdf", { type: file.type });
             setUploadedFileF4airhujan(renamedFile);
+            try {
+                const token = localStorage.getItem("token");
+                const id = localStorage.getItem("id_project");
+                const iduser = localStorage.getItem("id");
+
+                if (uploadedFileF4airhujan) {
+                    const formDataedit = new FormData();
+                    formDataedit.append('file', renamedFile);
+                    formDataedit.append('oldFileName', uploadedFileF4airhujan[0].file);
+                    // Jika uploadedFile sudah ada, lakukan PUT untuk update
+                    await axios.put(`${API_URL}/api/detail-project-utama/${uploadedFileF4airhujan[0].id_project_utama}`, formDataedit, {
+                        headers: {
+                            'Authorization': `Bearer ${token}`,
+                        }
+                    });
+
+                    await axios.post(`${API_URL}/api/log-aktivitas`, {
+                        id_project: id,
+                        id_user: iduser,
+                        aktivitas: "mengganti file",
+                        keterangan: "Form F4 - Perhitungan Air Hujan"
+                    }, {
+                        headers: {
+                            'Authorization': `Bearer ${token}`,
+                            'Content-Type': 'application/json'
+                        }
+                    });
+
+                } else {
+                    const formData = new FormData();
+                    formData.append('id_project', id);
+                    formData.append('pekerjaan', 'F4');
+                    formData.append('other_file', 'Perhitungan Air Hujan.pdf');
+                    formData.append('file', renamedFile);
+                    // Jika belum ada file, lakukan POST untuk upload
+                    await axios.post(`${API_URL}/api/detail-project-utama`, formData, {
+                        headers: {
+                            'Authorization': `Bearer ${token}`,
+                        }
+                    });
+
+                    await axios.post(`${API_URL}/api/log-aktivitas`, {
+                        id_project: id,
+                        id_user: iduser,
+                        aktivitas: "mengupload file",
+                        keterangan: "Form F4 - Perhitungan Air Hujan"
+                    }, {
+                        headers: {
+                            'Authorization': `Bearer ${token}`,
+                            'Content-Type': 'application/json'
+                        }
+                    });
+                }
+
+                // Jika diperlukan, panggil fungsi untuk memperbarui data
+                fetchDataUtama();
+                fetchDataLOG();
+            } catch (error) {
+                console.log("F4Perhitungan Air Hujan", error);
+            }
         } else {
             alert("Harap unggah file PDF.");
         }
     };
 
-    const handleFileChangeF4airbersih = (event) => {
+    const handleFileChangeF4airbersih = async (event) => {
         const file = event.target.files[0];
         if (file && file.type === "application/pdf") {
             const renamedFile = new File([file], "Perhitungan Air Bersih.pdf", { type: file.type });
             setUploadedFileF4airbersih(renamedFile);
+            try {
+                const token = localStorage.getItem("token");
+                const id = localStorage.getItem("id_project");
+                const iduser = localStorage.getItem("id");
+
+                if (uploadedFileF4airbersih) {
+                    const formDataedit = new FormData();
+                    formDataedit.append('file', renamedFile);
+                    formDataedit.append('oldFileName', uploadedFileF4airbersih[0].file);
+                    // Jika uploadedFile sudah ada, lakukan PUT untuk update
+                    await axios.put(`${API_URL}/api/detail-project-utama/${uploadedFileF4airbersih[0].id_project_utama}`, formDataedit, {
+                        headers: {
+                            'Authorization': `Bearer ${token}`,
+                        }
+                    });
+
+                    await axios.post(`${API_URL}/api/log-aktivitas`, {
+                        id_project: id,
+                        id_user: iduser,
+                        aktivitas: "mengganti file",
+                        keterangan: "Form F4 - Perhitungan Air Bersih"
+                    }, {
+                        headers: {
+                            'Authorization': `Bearer ${token}`,
+                            'Content-Type': 'application/json'
+                        }
+                    });
+
+                } else {
+                    const formData = new FormData();
+                    formData.append('id_project', id);
+                    formData.append('pekerjaan', 'F4');
+                    formData.append('other_file', 'Perhitungan Air Bersih.pdf');
+                    formData.append('file', renamedFile);
+                    // Jika belum ada file, lakukan POST untuk upload
+                    await axios.post(`${API_URL}/api/detail-project-utama`, formData, {
+                        headers: {
+                            'Authorization': `Bearer ${token}`,
+                        }
+                    });
+
+                    await axios.post(`${API_URL}/api/log-aktivitas`, {
+                        id_project: id,
+                        id_user: iduser,
+                        aktivitas: "mengupload file",
+                        keterangan: "Form F4 - Perhitungan Air Bersih"
+                    }, {
+                        headers: {
+                            'Authorization': `Bearer ${token}`,
+                            'Content-Type': 'application/json'
+                        }
+                    });
+                }
+
+                // Jika diperlukan, panggil fungsi untuk memperbarui data
+                fetchDataUtama();
+                fetchDataLOG();
+            } catch (error) {
+                console.log("F4Perhitungan Air Bersih.pdf", error);
+            }
         } else {
             alert("Harap unggah file PDF.");
         }
     };
 
-    const handleFileChangeF4airkotor = (event) => {
+    const handleFileChangeF4airkotor = async (event) => {
         const file = event.target.files[0];
         if (file && file.type === "application/pdf") {
             const renamedFile = new File([file], "Perhitungan Air Kotor.pdf", { type: file.type });
             setUploadedFileF4airkotor(renamedFile);
+            try {
+                const token = localStorage.getItem("token");
+                const id = localStorage.getItem("id_project");
+                const iduser = localStorage.getItem("id");
+
+                if (uploadedFileF4airkotor) {
+                    const formDataedit = new FormData();
+                    formDataedit.append('file', renamedFile);
+                    formDataedit.append('oldFileName', uploadedFileF4airkotor[0].file);
+                    // Jika uploadedFile sudah ada, lakukan PUT untuk update
+                    await axios.put(`${API_URL}/api/detail-project-utama/${uploadedFileF4airkotor[0].id_project_utama}`, formDataedit, {
+                        headers: {
+                            'Authorization': `Bearer ${token}`,
+                        }
+                    });
+
+                    await axios.post(`${API_URL}/api/log-aktivitas`, {
+                        id_project: id,
+                        id_user: iduser,
+                        aktivitas: "mengganti file",
+                        keterangan: "Form F4 - Perhitungan Air Kotor"
+                    }, {
+                        headers: {
+                            'Authorization': `Bearer ${token}`,
+                            'Content-Type': 'application/json'
+                        }
+                    });
+
+                } else {
+                    const formData = new FormData();
+                    formData.append('id_project', id);
+                    formData.append('pekerjaan', 'F4');
+                    formData.append('other_file', 'Perhitungan Air Kotor.pdf');
+                    formData.append('file', renamedFile);
+                    // Jika belum ada file, lakukan POST untuk upload
+                    await axios.post(`${API_URL}/api/detail-project-utama`, formData, {
+                        headers: {
+                            'Authorization': `Bearer ${token}`,
+                        }
+                    });
+
+                    await axios.post(`${API_URL}/api/log-aktivitas`, {
+                        id_project: id,
+                        id_user: iduser,
+                        aktivitas: "mengupload file",
+                        keterangan: "Form F4 - Perhitungan Air Kotor"
+                    }, {
+                        headers: {
+                            'Authorization': `Bearer ${token}`,
+                            'Content-Type': 'application/json'
+                        }
+                    });
+                }
+
+                // Jika diperlukan, panggil fungsi untuk memperbarui data
+                fetchDataUtama();
+                fetchDataLOG();
+            } catch (error) {
+                console.log("F4Perhitungan Air Kotor.pdf", error);
+            }
         } else {
             alert("Harap unggah file PDF.");
         }
     };
 
-    const handleFileChangeF4SLF = (event) => {
+    const handleFileChangeF4SLF = async (event) => {
         const file = event.target.files[0];
         if (file && file.type === "application/pdf") {
             const renamedFile = new File([file], "Kajian dan Simak (SLF).pdf", { type: file.type });
             setUploadedFileF4SLF(renamedFile);
+            try {
+                const token = localStorage.getItem("token");
+                const id = localStorage.getItem("id_project");
+                const iduser = localStorage.getItem("id");
+
+                if (uploadedFileF4SLF) {
+                    const formDataedit = new FormData();
+                    formDataedit.append('file', renamedFile);
+                    formDataedit.append('oldFileName', uploadedFileF4SLF[0].file);
+                    // Jika uploadedFile sudah ada, lakukan PUT untuk update
+                    await axios.put(`${API_URL}/api/detail-project-utama/${uploadedFileF4SLF[0].id_project_utama}`, formDataedit, {
+                        headers: {
+                            'Authorization': `Bearer ${token}`,
+                        }
+                    });
+
+                    await axios.post(`${API_URL}/api/log-aktivitas`, {
+                        id_project: id,
+                        id_user: iduser,
+                        aktivitas: "mengganti file",
+                        keterangan: "Form F4 - Kajian dan Simak (SLF)"
+                    }, {
+                        headers: {
+                            'Authorization': `Bearer ${token}`,
+                            'Content-Type': 'application/json'
+                        }
+                    });
+
+                } else {
+                    const formData = new FormData();
+                    formData.append('id_project', id);
+                    formData.append('pekerjaan', 'F4');
+                    formData.append('other_file', 'Kajian dan Simak (SLF).pdf');
+                    formData.append('file', renamedFile);
+                    // Jika belum ada file, lakukan POST untuk upload
+                    await axios.post(`${API_URL}/api/detail-project-utama`, formData, {
+                        headers: {
+                            'Authorization': `Bearer ${token}`,
+                        }
+                    });
+
+                    await axios.post(`${API_URL}/api/log-aktivitas`, {
+                        id_project: id,
+                        id_user: iduser,
+                        aktivitas: "mengupload file",
+                        keterangan: "Form F4 - Kajian dan Simak (SLF)"
+                    }, {
+                        headers: {
+                            'Authorization': `Bearer ${token}`,
+                            'Content-Type': 'application/json'
+                        }
+                    });
+                }
+
+                // Jika diperlukan, panggil fungsi untuk memperbarui data
+                fetchDataUtama();
+                fetchDataLOG();
+            } catch (error) {
+                console.log("F4Kajian dan Simak (SLF).pdf", error);
+            }
         } else {
             alert("Harap unggah file PDF.");
         }
@@ -259,120 +859,344 @@ const Form = ({ uploadedFile, setUploadedFile, uploadedFileF2, setUploadedFileF2
             alert("Tidak ada file yang diunggah.");
         }
     };
-    const handleDownloadTemplateF2 = () => {
+    const handleDownloadTemplateF2 = async () => {
         if (uploadedFileF2) {
-            const url = URL.createObjectURL(uploadedFileF2);
+            const url = uploadedFileF2 && uploadedFileF2[0]?.file
+                ? `${API_URL}/download/${uploadedFileF2[0].file}?rename=${uploadedFileF2[0].other_file}`
+                : URL.createObjectURL(uploadedFileF2[0].file);
             const link = document.createElement("a");
             link.href = url;
             link.download = uploadedFileF2.name;
             link.click();
             URL.revokeObjectURL(url);
+            try {
+                const token = localStorage.getItem("token");
+                const id = localStorage.getItem("id_project");
+                const iduser = localStorage.getItem("id");
+
+                await axios.post(`${API_URL}/api/log-aktivitas`, {
+                    id_project: id,
+                    id_user: iduser,
+                    aktivitas: "mengunduh file",
+                    keterangan: "Informasi Pekerjaan"
+                }, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+                fetchDataLOG();
+            } catch (error) {
+                console.log("logaktivitas", error)
+            }
         } else {
             alert("Tidak ada file yang diunggah.");
         }
     };
 
-    const handleDownloadTemplateF3pdf = () => {
+    const handleDownloadTemplateF3pdf = async() => {
         if (uploadedFileF3pdf) {
-            const url = URL.createObjectURL(uploadedFileF3pdf);
+            const url = uploadedFileF3pdf && uploadedFileF3pdf[0]?.file
+            ? `${API_URL}/download/${uploadedFileF3pdf[0].file}?rename=${uploadedFileF3pdf[0].other_file}`
+            : URL.createObjectURL(uploadedFileF3pdf[0].file);
             const link = document.createElement("a");
             link.href = url;
             link.download = uploadedFileF3pdf.name;
             link.click();
             URL.revokeObjectURL(url);
-        } if (uploadedFileF3docx) {
-            const url = URL.createObjectURL(uploadedFileF3docx);
+            try {
+                const token = localStorage.getItem("token");
+                const id = localStorage.getItem("id_project");
+                const iduser = localStorage.getItem("id");
+
+                await axios.post(`${API_URL}/api/log-aktivitas`, {
+                    id_project: id,
+                    id_user: iduser,
+                    aktivitas: "mengunduh file",
+                    keterangan: "Form F3 - PDF"
+                }, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+                fetchDataLOG();
+            } catch (error) {
+                console.log("logaktivitas", error)
+            }
+        }
+        else {
+            console.log("Tidak ada file yang diunggah f3 pdf.");
+        } 
+        if (uploadedFileF3docx) {
+            const url = uploadedFileF3docx && uploadedFileF3docx[0]?.file
+            ? `${API_URL}/download/${uploadedFileF3docx[0].file}?rename=${uploadedFileF3docx[0].other_file}`
+            : URL.createObjectURL(uploadedFileF3docx[0].file);
             const link = document.createElement("a");
             link.href = url;
             link.download = uploadedFileF3docx.name;
             link.click();
             URL.revokeObjectURL(url);
+            try {
+                const token = localStorage.getItem("token");
+                const id = localStorage.getItem("id_project");
+                const iduser = localStorage.getItem("id");
+
+                await axios.post(`${API_URL}/api/log-aktivitas`, {
+                    id_project: id,
+                    id_user: iduser,
+                    aktivitas: "mengunduh file",
+                    keterangan: "Form F3 - DOCX"
+                }, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+                fetchDataLOG();
+            } catch (error) {
+                console.log("logaktivitas", error)
+            }
         }
         else {
-            alert("Tidak ada file yang diunggah.");
+            console.log("Tidak ada file yang diunggah f3 docx.");
         }
     };
 
-    const handleDownloadTemplateF4gambar = () => {
+    const handleDownloadTemplateF4gambar = async () => {
         if (uploadedFileF4gambar) {
-            const url = URL.createObjectURL(uploadedFileF4gambar);
+            const url = uploadedFileF4gambar && uploadedFileF4gambar[0]?.file
+            ? `${API_URL}/download/${uploadedFileF4gambar[0].file}?rename=${uploadedFileF4gambar[0].other_file}`
+            : URL.createObjectURL(uploadedFileF4gambar[0].file);
             const link = document.createElement("a");
             link.href = url;
             link.download = uploadedFileF4gambar.name;
             link.click();
             URL.revokeObjectURL(url);
+            try {
+                const token = localStorage.getItem("token");
+                const id = localStorage.getItem("id_project");
+                const iduser = localStorage.getItem("id");
+
+                await axios.post(`${API_URL}/api/log-aktivitas`, {
+                    id_project: id,
+                    id_user: iduser,
+                    aktivitas: "mengunduh file",
+                    keterangan: "Form F4 - Gambar"
+                }, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+                fetchDataLOG();
+            } catch (error) {
+                console.log("logaktivitas", error)
+            }
         } else {
             alert("Tidak ada file yang diunggah.");
         }
     };
-    const handleDownloadTemplateF4analisa = () => {
+    const handleDownloadTemplateF4analisa = async () => {
         if (uploadedFileF4analisa) {
-            const url = URL.createObjectURL(uploadedFileF4analisa);
+            const url = uploadedFileF4analisa && uploadedFileF4analisa[0]?.file
+            ? `${API_URL}/download/${uploadedFileF4analisa[0].file}?rename=${uploadedFileF4analisa[0].other_file}`
+            : URL.createObjectURL(uploadedFileF4analisa[0].file);
             const link = document.createElement("a");
             link.href = url;
             link.download = uploadedFileF4analisa.name;
             link.click();
             URL.revokeObjectURL(url);
+            try {
+                const token = localStorage.getItem("token");
+                const id = localStorage.getItem("id_project");
+                const iduser = localStorage.getItem("id");
+
+                await axios.post(`${API_URL}/api/log-aktivitas`, {
+                    id_project: id,
+                    id_user: iduser,
+                    aktivitas: "mengunduh file",
+                    keterangan: "Form F4 - Analisa Struktur"
+                }, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+                fetchDataLOG();
+            } catch (error) {
+                console.log("logaktivitas", error)
+            }
         } else {
             alert("Tidak ada file yang diunggah.");
         }
     };
-    const handleDownloadTemplateF4spek = () => {
+    const handleDownloadTemplateF4spek = async () => {
         if (uploadedFileF4spek) {
-            const url = URL.createObjectURL(uploadedFileF4spek);
+            const url = uploadedFileF4spek && uploadedFileF4spek[0]?.file
+            ? `${API_URL}/download/${uploadedFileF4spek[0].file}?rename=${uploadedFileF4spek[0].other_file}`
+            : URL.createObjectURL(uploadedFileF4spek[0].file);
             const link = document.createElement("a");
             link.href = url;
             link.download = uploadedFileF4spek.name;
             link.click();
             URL.revokeObjectURL(url);
+            try {
+                const token = localStorage.getItem("token");
+                const id = localStorage.getItem("id_project");
+                const iduser = localStorage.getItem("id");
+
+                await axios.post(`${API_URL}/api/log-aktivitas`, {
+                    id_project: id,
+                    id_user: iduser,
+                    aktivitas: "mengunduh file",
+                    keterangan: "Form F4 - Spek Teknis"
+                }, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+                fetchDataLOG();
+            } catch (error) {
+                console.log("logaktivitas", error)
+            }
         } else {
             alert("Tidak ada file yang diunggah.");
         }
     };
-    const handleDownloadTemplateF4airhujan = () => {
+    const handleDownloadTemplateF4airhujan = async () => {
         if (uploadedFileF4airhujan) {
-            const url = URL.createObjectURL(uploadedFileF4airhujan);
+            const url = uploadedFileF4airhujan && uploadedFileF4airhujan[0]?.file
+            ? `${API_URL}/download/${uploadedFileF4airhujan[0].file}?rename=${uploadedFileF4airhujan[0].other_file}`
+            : URL.createObjectURL(uploadedFileF4airhujan[0].file);
             const link = document.createElement("a");
             link.href = url;
             link.download = uploadedFileF4airhujan.name;
             link.click();
             URL.revokeObjectURL(url);
+            try {
+                const token = localStorage.getItem("token");
+                const id = localStorage.getItem("id_project");
+                const iduser = localStorage.getItem("id");
+
+                await axios.post(`${API_URL}/api/log-aktivitas`, {
+                    id_project: id,
+                    id_user: iduser,
+                    aktivitas: "mengunduh file",
+                    keterangan: "Form F4 - Perhitungan Air Hujan"
+                }, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+                fetchDataLOG();
+            } catch (error) {
+                console.log("logaktivitas", error)
+            }
         } else {
             alert("Tidak ada file yang diunggah.");
         }
     };
-    const handleDownloadTemplateF4airbersih = () => {
+    const handleDownloadTemplateF4airbersih = async () => {
         if (uploadedFileF4airbersih) {
-            const url = URL.createObjectURL(uploadedFileF4airbersih);
+            const url = uploadedFileF4airbersih && uploadedFileF4airbersih[0]?.file
+            ? `${API_URL}/download/${uploadedFileF4airbersih[0].file}?rename=${uploadedFileF4airbersih[0].other_file}`
+            : URL.createObjectURL(uploadedFileF4airbersih[0].file);
             const link = document.createElement("a");
             link.href = url;
             link.download = uploadedFileF4airbersih.name;
             link.click();
             URL.revokeObjectURL(url);
+            try {
+                const token = localStorage.getItem("token");
+                const id = localStorage.getItem("id_project");
+                const iduser = localStorage.getItem("id");
+
+                await axios.post(`${API_URL}/api/log-aktivitas`, {
+                    id_project: id,
+                    id_user: iduser,
+                    aktivitas: "mengunduh file",
+                    keterangan: "Form F4 - Perhitungan Air Bersih"
+                }, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+                fetchDataLOG();
+            } catch (error) {
+                console.log("logaktivitas", error)
+            }
         } else {
             alert("Tidak ada file yang diunggah.");
         }
     };
-    const handleDownloadTemplateF4airkotor = () => {
+    const handleDownloadTemplateF4airkotor = async () => {
         if (uploadedFileF4airkotor) {
-            const url = URL.createObjectURL(uploadedFileF4airkotor);
+            const url = uploadedFileF4airkotor && uploadedFileF4airkotor[0]?.file
+            ? `${API_URL}/download/${uploadedFileF4airkotor[0].file}?rename=${uploadedFileF4airkotor[0].other_file}`
+            : URL.createObjectURL(uploadedFileF4airkotor[0].file);
             const link = document.createElement("a");
             link.href = url;
             link.download = uploadedFileF4airkotor.name;
             link.click();
             URL.revokeObjectURL(url);
+            try {
+                const token = localStorage.getItem("token");
+                const id = localStorage.getItem("id_project");
+                const iduser = localStorage.getItem("id");
+
+                await axios.post(`${API_URL}/api/log-aktivitas`, {
+                    id_project: id,
+                    id_user: iduser,
+                    aktivitas: "mengunduh file",
+                    keterangan: "Form F4 - Perhitungan Air Kotor"
+                }, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+                fetchDataLOG();
+            } catch (error) {
+                console.log("logaktivitas", error)
+            }
         } else {
             alert("Tidak ada file yang diunggah.");
         }
     };
-    const handleDownloadTemplateF4SLF = () => {
+    const handleDownloadTemplateF4SLF = async () => {
         if (uploadedFileF4SLF) {
-            const url = URL.createObjectURL(uploadedFileF4SLF);
+            const url = uploadedFileF4SLF && uploadedFileF4SLF[0]?.file
+            ? `${API_URL}/download/${uploadedFileF4SLF[0].file}?rename=${uploadedFileF4SLF[0].other_file}`
+            : URL.createObjectURL(uploadedFileF4SLF[0].file);
             const link = document.createElement("a");
             link.href = url;
             link.download = uploadedFileF4SLF.name;
             link.click();
             URL.revokeObjectURL(url);
+            try {
+                const token = localStorage.getItem("token");
+                const id = localStorage.getItem("id_project");
+                const iduser = localStorage.getItem("id");
+
+                await axios.post(`${API_URL}/api/log-aktivitas`, {
+                    id_project: id,
+                    id_user: iduser,
+                    aktivitas: "mengunduh file",
+                    keterangan: "Form F4 - Kajian dan Simak (SLF)"
+                }, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+                fetchDataLOG();
+            } catch (error) {
+                console.log("logaktivitas", error)
+            }
         } else {
             alert("Tidak ada file yang diunggah.");
         }
@@ -415,69 +1239,389 @@ const Form = ({ uploadedFile, setUploadedFile, uploadedFileF2, setUploadedFileF2
             }
         }
     };
-    const handleFileClickF2 = () => {
+    const handleFileClickF2 = async () => {
         if (uploadedFileF2) {
-            const fileURL = URL.createObjectURL(uploadedFileF2);
-            window.open(fileURL, '_blank');
+            const fileUrl = uploadedFileF2 && uploadedFileF2[0] ? `${API_URL}/uploads/${uploadedFileF2[0]?.file}` : null;
+            try {
+                const token = localStorage.getItem("token");
+                const id = localStorage.getItem("id_project");
+                const iduser = localStorage.getItem("id");
+
+                await axios.post(`${API_URL}/api/log-aktivitas`, {
+                    id_project: id,
+                    id_user: iduser,
+                    aktivitas: "melihat file",
+                    keterangan: "Informasi Pekerjaan"
+                }, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+                fetchDataLOG();
+            } catch (error) {
+                console.log("logaktivitas", error)
+            }
+
+            if (fileUrl) {
+                // Jika file URL dari server tersedia, buka di tab baru
+                window.open(fileUrl, '_blank');
+            } else if (uploadedFileF2 && uploadedFileF2[0]?.file) {
+                // Jika file URL tidak tersedia, gunakan URL.createObjectURL untuk membuka file lokal
+                const fileURL = URL.createObjectURL(uploadedFileF2[0].file);
+                window.open(fileURL, '_blank');
+            } else {
+                alert('File tidak tersedia.');
+            }
         }
     };
-    const handleFileClickF3pdf = () => {
+    const handleFileClickF3pdf = async() => {
         if (uploadedFileF3pdf) {
-            const fileURL = URL.createObjectURL(uploadedFileF3pdf);
-            window.open(fileURL, '_blank');
+            const fileUrl = uploadedFileF3pdf && uploadedFileF3pdf[0] ? `${API_URL}/uploads/${uploadedFileF3pdf[0]?.file}` : null;
+            try {
+                const token = localStorage.getItem("token");
+                const id = localStorage.getItem("id_project");
+                const iduser = localStorage.getItem("id");
+
+                await axios.post(`${API_URL}/api/log-aktivitas`, {
+                    id_project: id,
+                    id_user: iduser,
+                    aktivitas: "melihat file",
+                    keterangan: "Form F3 - PDF"
+                }, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+                fetchDataLOG();
+            } catch (error) {
+                console.log("logaktivitas", error)
+            }
+
+            if (fileUrl) {
+                // Jika file URL dari server tersedia, buka di tab baru
+                window.open(fileUrl, '_blank');
+            } else if (uploadedFileF3pdf && uploadedFileF3pdf[0]?.file) {
+                // Jika file URL tidak tersedia, gunakan URL.createObjectURL untuk membuka file lokal
+                const fileURL = URL.createObjectURL(uploadedFileF3pdf[0].file);
+                window.open(fileURL, '_blank');
+            } else {
+                alert('File tidak tersedia.');
+            }
         }
     };
-    const handleFileClickF3docx = () => {
+    const handleFileClickF3docx = async () => {
         if (uploadedFileF3docx) {
-            const fileURL = URL.createObjectURL(uploadedFileF3docx);
-            window.open(fileURL, '_blank');
+            const fileUrl = uploadedFileF3docx && uploadedFileF3docx[0] ? `${API_URL}/download/${uploadedFileF3docx[0].file}?rename=${uploadedFileF3docx[0].other_file}` : null;
+            try {
+                const token = localStorage.getItem("token");
+                const id = localStorage.getItem("id_project");
+                const iduser = localStorage.getItem("id");
+
+                await axios.post(`${API_URL}/api/log-aktivitas`, {
+                    id_project: id,
+                    id_user: iduser,
+                    aktivitas: "melihat file",
+                    keterangan: "Form F3 - DOCX"
+                }, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+                fetchDataLOG();
+            } catch (error) {
+                console.log("logaktivitas", error)
+            }
+
+            if (fileUrl) {
+                // Jika file URL dari server tersedia, buka di tab baru
+                window.open(fileUrl, '_blank');
+            } else if (uploadedFileF3docx && uploadedFileF3docx[0]?.file) {
+                // Jika file URL tidak tersedia, gunakan URL.createObjectURL untuk membuka file lokal
+                const fileURL = URL.createObjectURL(uploadedFileF3docx[0].file);
+                window.open(fileURL, '_blank');
+            } else {
+                alert('File tidak tersedia.');
+            }
         }
     };
-    const handleFileClickF4gambar = () => {
+    const handleFileClickF4gambar = async () => {
         if (uploadedFileF4gambar) {
-            const fileURL = URL.createObjectURL(uploadedFileF4gambar);
-            window.open(fileURL, '_blank');
+            const fileUrl = uploadedFileF4gambar && uploadedFileF4gambar[0] ? `${API_URL}/uploads/${uploadedFileF4gambar[0]?.file}` : null;
+            try {
+                const token = localStorage.getItem("token");
+                const id = localStorage.getItem("id_project");
+                const iduser = localStorage.getItem("id");
+
+                await axios.post(`${API_URL}/api/log-aktivitas`, {
+                    id_project: id,
+                    id_user: iduser,
+                    aktivitas: "melihat file",
+                    keterangan: "Form F4 - Gambar"
+                }, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+                fetchDataLOG();
+            } catch (error) {
+                console.log("logaktivitas", error)
+            }
+
+            if (fileUrl) {
+                // Jika file URL dari server tersedia, buka di tab baru
+                window.open(fileUrl, '_blank');
+            } else if (uploadedFileF4gambar && uploadedFileF4gambar[0]?.file) {
+                // Jika file URL tidak tersedia, gunakan URL.createObjectURL untuk membuka file lokal
+                const fileURL = URL.createObjectURL(uploadedFileF4gambar[0].file);
+                window.open(fileURL, '_blank');
+            } else {
+                alert('File tidak tersedia.');
+            }
         }
     };
-    const handleFileClickF4analisa = () => {
+    const handleFileClickF4analisa = async () => {
         if (uploadedFileF4analisa) {
-            const fileURL = URL.createObjectURL(uploadedFileF4analisa);
-            window.open(fileURL, '_blank');
+            const fileUrl = uploadedFileF4analisa && uploadedFileF4analisa[0] ? `${API_URL}/uploads/${uploadedFileF4analisa[0]?.file}` : null;
+            try {
+                const token = localStorage.getItem("token");
+                const id = localStorage.getItem("id_project");
+                const iduser = localStorage.getItem("id");
+
+                await axios.post(`${API_URL}/api/log-aktivitas`, {
+                    id_project: id,
+                    id_user: iduser,
+                    aktivitas: "melihat file",
+                    keterangan: "Form F4 - Analisa Struktur"
+                }, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+                fetchDataLOG();
+            } catch (error) {
+                console.log("logaktivitas", error)
+            }
+
+            if (fileUrl) {
+                // Jika file URL dari server tersedia, buka di tab baru
+                window.open(fileUrl, '_blank');
+            } else if (uploadedFileF4analisa && uploadedFileF4analisa[0]?.file) {
+                // Jika file URL tidak tersedia, gunakan URL.createObjectURL untuk membuka file lokal
+                const fileURL = URL.createObjectURL(uploadedFileF4analisa[0].file);
+                window.open(fileURL, '_blank');
+            } else {
+                alert('File tidak tersedia.');
+            }
         }
     };
-    const handleFileClickF4spek = () => {
+    const handleFileClickF4spek = async () => {
         if (uploadedFileF4spek) {
-            const fileURL = URL.createObjectURL(uploadedFileF4spek);
-            window.open(fileURL, '_blank');
+            const fileUrl = uploadedFileF4spek && uploadedFileF4spek[0] ? `${API_URL}/uploads/${uploadedFileF4spek[0]?.file}` : null;
+            try {
+                const token = localStorage.getItem("token");
+                const id = localStorage.getItem("id_project");
+                const iduser = localStorage.getItem("id");
+
+                await axios.post(`${API_URL}/api/log-aktivitas`, {
+                    id_project: id,
+                    id_user: iduser,
+                    aktivitas: "melihat file",
+                    keterangan: "Form F4 - Spek Teknis"
+                }, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+                fetchDataLOG();
+            } catch (error) {
+                console.log("logaktivitas", error)
+            }
+
+            if (fileUrl) {
+                // Jika file URL dari server tersedia, buka di tab baru
+                window.open(fileUrl, '_blank');
+            } else if (uploadedFileF4spek && uploadedFileF4spek[0]?.file) {
+                // Jika file URL tidak tersedia, gunakan URL.createObjectURL untuk membuka file lokal
+                const fileURL = URL.createObjectURL(uploadedFileF4spek[0].file);
+                window.open(fileURL, '_blank');
+            } else {
+                alert('File tidak tersedia.');
+            }
         }
     };
-    const handleFileClickF4airhujan = () => {
+    const handleFileClickF4airhujan = async () => {
         if (uploadedFileF4airhujan) {
-            const fileURL = URL.createObjectURL(uploadedFileF4airhujan);
-            window.open(fileURL, '_blank');
+            const fileUrl = uploadedFileF4airhujan && uploadedFileF4airhujan[0] ? `${API_URL}/uploads/${uploadedFileF4airhujan[0]?.file}` : null;
+            try {
+                const token = localStorage.getItem("token");
+                const id = localStorage.getItem("id_project");
+                const iduser = localStorage.getItem("id");
+
+                await axios.post(`${API_URL}/api/log-aktivitas`, {
+                    id_project: id,
+                    id_user: iduser,
+                    aktivitas: "melihat file",
+                    keterangan: "Form F4 - Perhitungan Air Hujan"
+                }, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+                fetchDataLOG();
+            } catch (error) {
+                console.log("logaktivitas", error)
+            }
+
+            if (fileUrl) {
+                // Jika file URL dari server tersedia, buka di tab baru
+                window.open(fileUrl, '_blank');
+            } else if (uploadedFileF4airhujan && uploadedFileF4airhujan[0]?.file) {
+                // Jika file URL tidak tersedia, gunakan URL.createObjectURL untuk membuka file lokal
+                const fileURL = URL.createObjectURL(uploadedFileF4airhujan[0].file);
+                window.open(fileURL, '_blank');
+            } else {
+                alert('File tidak tersedia.');
+            }
         }
     };
-    const handleFileClickF4airbersih = () => {
+    const handleFileClickF4airbersih = async () => {
         if (uploadedFileF4airbersih) {
-            const fileURL = URL.createObjectURL(uploadedFileF4airbersih);
-            window.open(fileURL, '_blank');
+            const fileUrl = uploadedFileF4airbersih && uploadedFileF4airbersih[0] ? `${API_URL}/uploads/${uploadedFileF4airbersih[0]?.file}` : null;
+            try {
+                const token = localStorage.getItem("token");
+                const id = localStorage.getItem("id_project");
+                const iduser = localStorage.getItem("id");
+
+                await axios.post(`${API_URL}/api/log-aktivitas`, {
+                    id_project: id,
+                    id_user: iduser,
+                    aktivitas: "melihat file",
+                    keterangan: "Form F4 - Perhitungan Air Bersih"
+                }, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+                fetchDataLOG();
+            } catch (error) {
+                console.log("logaktivitas", error)
+            }
+
+            if (fileUrl) {
+                // Jika file URL dari server tersedia, buka di tab baru
+                window.open(fileUrl, '_blank');
+            } else if (uploadedFileF4airbersih && uploadedFileF4airbersih[0]?.file) {
+                // Jika file URL tidak tersedia, gunakan URL.createObjectURL untuk membuka file lokal
+                const fileURL = URL.createObjectURL(uploadedFileF4airbersih[0].file);
+                window.open(fileURL, '_blank');
+            } else {
+                alert('File tidak tersedia.');
+            }
         }
     };
-    const handleFileClickF4airkotor = () => {
+    const handleFileClickF4airkotor = async () => {
         if (uploadedFileF4airkotor) {
-            const fileURL = URL.createObjectURL(uploadedFileF4airkotor);
-            window.open(fileURL, '_blank');
+            const fileUrl = uploadedFileF4airkotor && uploadedFileF4airkotor[0] ? `${API_URL}/uploads/${uploadedFileF4airkotor[0]?.file}` : null;
+            try {
+                const token = localStorage.getItem("token");
+                const id = localStorage.getItem("id_project");
+                const iduser = localStorage.getItem("id");
+
+                await axios.post(`${API_URL}/api/log-aktivitas`, {
+                    id_project: id,
+                    id_user: iduser,
+                    aktivitas: "melihat file",
+                    keterangan: "Form F4 - Perhitungan Air Kotor"
+                }, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+                fetchDataLOG();
+            } catch (error) {
+                console.log("logaktivitas", error)
+            }
+
+            if (fileUrl) {
+                // Jika file URL dari server tersedia, buka di tab baru
+                window.open(fileUrl, '_blank');
+            } else if (uploadedFileF4airkotor && uploadedFileF4airkotor[0]?.file) {
+                // Jika file URL tidak tersedia, gunakan URL.createObjectURL untuk membuka file lokal
+                const fileURL = URL.createObjectURL(uploadedFileF4airkotor[0].file);
+                window.open(fileURL, '_blank');
+            } else {
+                alert('File tidak tersedia.');
+            }
         }
     };
-    const handleFileClickF4SLF = () => {
+    const handleFileClickF4SLF = async() => {
         if (uploadedFileF4SLF) {
-            const fileURL = URL.createObjectURL(uploadedFileF4SLF);
-            window.open(fileURL, '_blank');
+            const fileUrl = uploadedFileF4SLF && uploadedFileF4SLF[0] ? `${API_URL}/uploads/${uploadedFileF4SLF[0]?.file}` : null;
+            try {
+                const token = localStorage.getItem("token");
+                const id = localStorage.getItem("id_project");
+                const iduser = localStorage.getItem("id");
+
+                await axios.post(`${API_URL}/api/log-aktivitas`, {
+                    id_project: id,
+                    id_user: iduser,
+                    aktivitas: "melihat file",
+                    keterangan: "Form F4 - Kajian dan Simak (SLF)"
+                }, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+                fetchDataLOG();
+            } catch (error) {
+                console.log("logaktivitas", error)
+            }
+
+            if (fileUrl) {
+                // Jika file URL dari server tersedia, buka di tab baru
+                window.open(fileUrl, '_blank');
+            } else if (uploadedFileF4SLF && uploadedFileF4SLF[0]?.file) {
+                // Jika file URL tidak tersedia, gunakan URL.createObjectURL untuk membuka file lokal
+                const fileURL = URL.createObjectURL(uploadedFileF4SLF[0].file);
+                window.open(fileURL, '_blank');
+            } else {
+                alert('File tidak tersedia.');
+            }
         }
     };
 
     const [serverFileSize, setServerFileSize] = useState(null);
+    const [serverFileSizef2, setServerFileSizef2] = useState(null);
+    const [serverFileSizef3pdf, setServerFileSizef3pdf] = useState(null);
+    const [serverFileSizef3docx, setServerFileSizef3docx] = useState(null);
+    const [serverFileSizef4gambar, setServerFileSizef4gambar] = useState(null);
+    const [serverFileSizef4analisa, setServerFileSizef4analisa] = useState(null);
+    const [serverFileSizef4spek, setServerFileSizef4spek] = useState(null);
+    const [serverFileSizef4airhujan, setServerFileSizef4airhujan] = useState(null);
+    const [serverFileSizef4airbersih, setServerFileSizef4airbersih] = useState(null);
+    const [serverFileSizef4airkotor, setServerFileSizef4airkotor] = useState(null);
+    const [serverFileSizef4slf, setServerFileSizef4slf] = useState(null);
     const fileUrl = uploadedFile && uploadedFile[0] ? `${API_URL}/uploads/${uploadedFile[0].file}` : null;
+    const fileUrlf2 = uploadedFileF2 && uploadedFileF2[0] ? `${API_URL}/uploads/${uploadedFileF2[0].file}` : null;
+    const fileUrlf3pdf = uploadedFileF3pdf && uploadedFileF3pdf[0] ? `${API_URL}/uploads/${uploadedFileF3pdf[0].file}` : null;
+    const fileUrlf3docx = uploadedFileF3docx && uploadedFileF3docx[0] ? `${API_URL}/uploads/${uploadedFileF3docx[0].file}` : null;
+    const fileUrlf4gambar = uploadedFileF4gambar && uploadedFileF4gambar[0] ? `${API_URL}/uploads/${uploadedFileF4gambar[0].file}` : null;
+    const fileUrlf4analisa = uploadedFileF4analisa && uploadedFileF4analisa[0] ? `${API_URL}/uploads/${uploadedFileF4analisa[0].file}` : null;
+    const fileUrlf4spek = uploadedFileF4spek && uploadedFileF4spek[0] ? `${API_URL}/uploads/${uploadedFileF4spek[0].file}` : null;
+    const fileUrlf4airhujan = uploadedFileF4airhujan && uploadedFileF4airhujan[0] ? `${API_URL}/uploads/${uploadedFileF4airhujan[0].file}` : null;
+    const fileUrlf4airbersih = uploadedFileF4airbersih && uploadedFileF4airbersih[0] ? `${API_URL}/uploads/${uploadedFileF4airbersih[0].file}` : null;
+    const fileUrlf4airkotor = uploadedFileF4airkotor && uploadedFileF4airkotor[0] ? `${API_URL}/uploads/${uploadedFileF4airkotor[0].file}` : null;
+    const fileUrlf4slf = uploadedFileF4SLF && uploadedFileF4SLF[0] ? `${API_URL}/uploads/${uploadedFileF4SLF[0].file}` : null;
     useEffect(() => {
         const fetchFileSize = async () => {
             if (uploadedFile) {
@@ -498,6 +1642,206 @@ const Form = ({ uploadedFile, setUploadedFile, uploadedFileF2, setUploadedFileF2
 
         fetchFileSize();
     }, [uploadedFile, fileUrl]);
+    useEffect(() => {
+        const fetchFileSizef2 = async () => {
+            if (uploadedFileF2) {
+                try {
+                    const response = await axios.head(fileUrlf2);
+                    const contentLength = response.headers['content-length'];
+                    if (contentLength) {
+                        setServerFileSizef2((contentLength / (1024 * 1024)).toFixed(2)); // Convert to MB
+                    } else {
+                        setServerFileSizef2('Ukuran tidak tersedia');
+                    }
+                } catch (error) {
+                    // console.error('Gagal mendapatkan ukuran file:', error);
+                    setServerFileSizef2('Error mendapatkan ukuran');
+                }
+            }
+        };
+
+        fetchFileSizef2();
+    }, [uploadedFileF2, fileUrlf2]);
+    useEffect(() => {
+        const fetchFileSizef3pdf = async () => {
+            if (uploadedFileF3pdf) {
+                try {
+                    const response = await axios.head(fileUrlf3pdf);
+                    const contentLength = response.headers['content-length'];
+                    if (contentLength) {
+                        setServerFileSizef3pdf((contentLength / (1024 * 1024)).toFixed(2)); // Convert to MB
+                    } else {
+                        setServerFileSizef3pdf('Ukuran tidak tersedia');
+                    }
+                } catch (error) {
+                    // console.error('Gagal mendapatkan ukuran file:', error);
+                    setServerFileSizef3pdf('Error mendapatkan ukuran');
+                }
+            }
+        };
+
+        fetchFileSizef3pdf();
+    }, [uploadedFileF3pdf, fileUrlf3pdf]);
+    useEffect(() => {
+        const fetchFileSizef3docx = async () => {
+            if (uploadedFileF3docx) {
+                try {
+                    const response = await axios.head(fileUrlf3docx);
+                    const contentLength = response.headers['content-length'];
+                    if (contentLength) {
+                        setServerFileSizef3docx((contentLength / (1024 * 1024)).toFixed(2)); // Convert to MB
+                    } else {
+                        setServerFileSizef3docx('Ukuran tidak tersedia');
+                    }
+                } catch (error) {
+                    // console.error('Gagal mendapatkan ukuran file:', error);
+                    setServerFileSizef3docx('Error mendapatkan ukuran');
+                }
+            }
+        };
+
+        fetchFileSizef3docx();
+    }, [uploadedFileF3docx, fileUrlf3docx]);
+    useEffect(() => {
+        const fetchFileSizef4gambar = async () => {
+            if (uploadedFileF4gambar) {
+                try {
+                    const response = await axios.head(fileUrlf4gambar);
+                    const contentLength = response.headers['content-length'];
+                    if (contentLength) {
+                        setServerFileSizef4gambar((contentLength / (1024 * 1024)).toFixed(2)); // Convert to MB
+                    } else {
+                        setServerFileSizef4gambar('Ukuran tidak tersedia');
+                    }
+                } catch (error) {
+                    // console.error('Gagal mendapatkan ukuran file:', error);
+                    setServerFileSizef4gambar('Error mendapatkan ukuran');
+                }
+            }
+        };
+
+        fetchFileSizef4gambar();
+    }, [uploadedFileF4gambar, fileUrlf4gambar]);
+    useEffect(() => {
+        const fetchFileSizef4analisa = async () => {
+            if (uploadedFileF4analisa) {
+                try {
+                    const response = await axios.head(fileUrlf4analisa);
+                    const contentLength = response.headers['content-length'];
+                    if (contentLength) {
+                        setServerFileSizef4analisa((contentLength / (1024 * 1024)).toFixed(2)); // Convert to MB
+                    } else {
+                        setServerFileSizef4analisa('Ukuran tidak tersedia');
+                    }
+                } catch (error) {
+                    // console.error('Gagal mendapatkan ukuran file:', error);
+                    setServerFileSizef4analisa('Error mendapatkan ukuran');
+                }
+            }
+        };
+
+        fetchFileSizef4analisa();
+    }, [uploadedFileF4analisa, fileUrlf4analisa]);
+    useEffect(() => {
+        const fetchFileSizef4spek = async () => {
+            if (uploadedFileF4spek) {
+                try {
+                    const response = await axios.head(fileUrlf4spek);
+                    const contentLength = response.headers['content-length'];
+                    if (contentLength) {
+                        setServerFileSizef4spek((contentLength / (1024 * 1024)).toFixed(2)); // Convert to MB
+                    } else {
+                        setServerFileSizef4spek('Ukuran tidak tersedia');
+                    }
+                } catch (error) {
+                    // console.error('Gagal mendapatkan ukuran file:', error);
+                    setServerFileSizef4spek('Error mendapatkan ukuran');
+                }
+            }
+        };
+
+        fetchFileSizef4spek();
+    }, [uploadedFileF4spek, fileUrlf4spek]);
+    useEffect(() => {
+        const fetchFileSizef4airhujan = async () => {
+            if (uploadedFileF4airhujan) {
+                try {
+                    const response = await axios.head(fileUrlf4airhujan);
+                    const contentLength = response.headers['content-length'];
+                    if (contentLength) {
+                        setServerFileSizef4airhujan((contentLength / (1024 * 1024)).toFixed(2)); // Convert to MB
+                    } else {
+                        setServerFileSizef4airhujan('Ukuran tidak tersedia');
+                    }
+                } catch (error) {
+                    // console.error('Gagal mendapatkan ukuran file:', error);
+                    setServerFileSizef4airhujan('Error mendapatkan ukuran');
+                }
+            }
+        };
+
+        fetchFileSizef4airhujan();
+    }, [uploadedFileF4airhujan, fileUrlf4airhujan]);
+    useEffect(() => {
+        const fetchFileSizef4airbersih = async () => {
+            if (uploadedFileF4airbersih) {
+                try {
+                    const response = await axios.head(fileUrlf4airbersih);
+                    const contentLength = response.headers['content-length'];
+                    if (contentLength) {
+                        setServerFileSizef4airbersih((contentLength / (1024 * 1024)).toFixed(2)); // Convert to MB
+                    } else {
+                        setServerFileSizef4airbersih('Ukuran tidak tersedia');
+                    }
+                } catch (error) {
+                    // console.error('Gagal mendapatkan ukuran file:', error);
+                    setServerFileSizef4airbersih('Error mendapatkan ukuran');
+                }
+            }
+        };
+
+        fetchFileSizef4airbersih();
+    }, [uploadedFileF4airbersih, fileUrlf4airbersih]);
+    useEffect(() => {
+        const fetchFileSizef4airkotor = async () => {
+            if (uploadedFileF4airkotor) {
+                try {
+                    const response = await axios.head(fileUrlf4airkotor);
+                    const contentLength = response.headers['content-length'];
+                    if (contentLength) {
+                        setServerFileSizef4airkotor((contentLength / (1024 * 1024)).toFixed(2)); // Convert to MB
+                    } else {
+                        setServerFileSizef4airkotor('Ukuran tidak tersedia');
+                    }
+                } catch (error) {
+                    // console.error('Gagal mendapatkan ukuran file:', error);
+                    setServerFileSizef4airkotor('Error mendapatkan ukuran');
+                }
+            }
+        };
+
+        fetchFileSizef4airkotor();
+    }, [uploadedFileF4airkotor, fileUrlf4airkotor]);
+    useEffect(() => {
+        const fetchFileSizef4slf = async () => {
+            if (uploadedFileF4SLF) {
+                try {
+                    const response = await axios.head(fileUrlf4slf);
+                    const contentLength = response.headers['content-length'];
+                    if (contentLength) {
+                        setServerFileSizef4slf((contentLength / (1024 * 1024)).toFixed(2)); // Convert to MB
+                    } else {
+                        setServerFileSizef4slf('Ukuran tidak tersedia');
+                    }
+                } catch (error) {
+                    // console.error('Gagal mendapatkan ukuran file:', error);
+                    setServerFileSizef4slf('Error mendapatkan ukuran');
+                }
+            }
+        };
+
+        fetchFileSizef4slf();
+    }, [uploadedFileF4SLF, fileUrlf4slf]);
 
     return (
         <div>
@@ -570,13 +1914,24 @@ const Form = ({ uploadedFile, setUploadedFile, uploadedFileF2, setUploadedFileF2
                                 <div onClick={handleFileClickF2} className='flex gap-[12px] cursor-pointer'>
                                     <img src={Pdf} alt="pdf" className='w-[36px] h-[36px]' />
                                     <div className='text-left grid gap-[4px]'>
-                                        <h4 className='text-[12px] font-bold'>{uploadedFileF2.name.length > 16 ? `${uploadedFileF2.name.slice(0, 16)}...` : uploadedFileF2.name}</h4>
-                                        <p className='text-[12px] text-[#717179]'>{(uploadedFileF2.size / (1024 * 1024)).toFixed(2)} MB</p>
+                                        <h4 className='text-[12px] font-bold'>
+                                            {uploadedFileF2?.name
+                                                ? (uploadedFileF2.name.length > 16
+                                                    ? `${uploadedFileF2.name.slice(0, 16)}...`
+                                                    : uploadedFileF2.name)
+                                                : (uploadedFileF2[0]?.other_file
+                                                    ? (uploadedFileF2[0]?.other_file.length > 16
+                                                        ? `${uploadedFileF2[0]?.other_file.slice(0, 16)}...`
+                                                        : uploadedFileF2[0]?.other_file)
+                                                    : "Nama file tidak tersedia")
+                                            }
+                                        </h4>
+                                        <p className='text-[12px] text-[#717179]'>{uploadedFileF2.size ? (uploadedFileF2.size / (1024 * 1024)).toFixed(2) : serverFileSizef2} MB</p>
                                     </div>
                                 </div>
                                 <div className='flex gap-[12px]'>
                                     <EditFile handleUploadClick={handleUploadClickF2} />
-                                    <HapusFile setUploadedFile={setUploadedFileF2} />
+                                    <HapusFile setUploadedFile={setUploadedFileF2}  UploadedFile={uploadedFileF2}  DataFileUtama={DataFileUtama} setDataFileUtama={setDataFileUtama} fetchDataLOG={fetchDataLOG} fetchDataUtama={fetchDataUtama} />
                                 </div>
                             </div>
                         )}
@@ -605,13 +1960,24 @@ const Form = ({ uploadedFile, setUploadedFile, uploadedFileF2, setUploadedFileF2
                                 <div onClick={handleFileClickF3pdf} className='flex gap-[12px] cursor-pointer'>
                                     <img src={Pdf} alt="pdf" className='w-[36px] h-[36px]' />
                                     <div className='text-left grid gap-[4px]'>
-                                        <h4 className='text-[12px] font-bold'>{uploadedFileF3pdf.name.length > 16 ? `${uploadedFileF3pdf.name.slice(0, 16)}...` : uploadedFileF3pdf.name}</h4>
-                                        <p className='text-[12px] text-[#717179]'>{(uploadedFileF3pdf.size / (1024 * 1024)).toFixed(2)} MB</p>
+                                        <h4 className='text-[12px] font-bold'>
+                                        {uploadedFileF3pdf?.name
+                                                ? (uploadedFileF3pdf.name.length > 16
+                                                    ? `${uploadedFileF3pdf.name.slice(0, 16)}...`
+                                                    : uploadedFileF3pdf.name)
+                                                : (uploadedFileF3pdf[0]?.other_file
+                                                    ? (uploadedFileF3pdf[0]?.other_file.length > 16
+                                                        ? `${uploadedFileF3pdf[0]?.other_file.slice(0, 16)}...`
+                                                        : uploadedFileF3pdf[0]?.other_file)
+                                                    : "Nama file tidak tersedia")
+                                            }
+                                        </h4>
+                                        <p className='text-[12px] text-[#717179]'>{uploadedFileF3pdf.size ? (uploadedFileF3pdf.size / (1024 * 1024)).toFixed(2) : serverFileSizef3pdf} MB</p>
                                     </div>
                                 </div>
                                 <div className='flex gap-[12px]'>
                                     <EditFile handleUploadClick={handleUploadClickF3pdf} />
-                                    <HapusFile setUploadedFile={setUploadedFileF3pdf} />
+                                    <HapusFile setUploadedFile={setUploadedFileF3pdf} UploadedFile={uploadedFileF3pdf}  DataFileUtama={DataFileUtama} setDataFileUtama={setDataFileUtama} fetchDataLOG={fetchDataLOG} fetchDataUtama={fetchDataUtama}/>
                                 </div>
                             </div>
                         )}
@@ -631,13 +1997,24 @@ const Form = ({ uploadedFile, setUploadedFile, uploadedFileF2, setUploadedFileF2
                                 <div onClick={handleFileClickF3docx} className='flex gap-[12px] cursor-pointer'>
                                     <img src={Docx} alt="docx" className='w-[36px] h-[36px]' />
                                     <div className='text-left grid gap-[4px]'>
-                                        <h4 className='text-[12px] font-bold'>{uploadedFileF3docx.name.length > 16 ? `${uploadedFileF3docx.name.slice(0, 16)}...` : uploadedFileF3docx.name}</h4>
-                                        <p className='text-[12px] text-[#717179]'>{(uploadedFileF3docx.size / (1024 * 1024)).toFixed(2)} MB</p>
+                                        <h4 className='text-[12px] font-bold'>
+                                        {uploadedFileF3docx?.name
+                                                ? (uploadedFileF3docx.name.length > 16
+                                                    ? `${uploadedFileF3docx.name.slice(0, 16)}...`
+                                                    : uploadedFileF3docx.name)
+                                                : (uploadedFileF3docx[0]?.other_file
+                                                    ? (uploadedFileF3docx[0]?.other_file.length > 16
+                                                        ? `${uploadedFileF3docx[0]?.other_file.slice(0, 16)}...`
+                                                        : uploadedFileF3docx[0]?.other_file)
+                                                    : "Nama file tidak tersedia")
+                                            }
+                                        </h4>
+                                        <p className='text-[12px] text-[#717179]'>{uploadedFileF3docx.size ? (uploadedFileF3docx.size / (1024 * 1024)).toFixed(2) : serverFileSizef3docx} MB</p>
                                     </div>
                                 </div>
                                 <div className='flex gap-[12px]'>
                                     <EditFile handleUploadClick={handleUploadClickF3docx} />
-                                    <HapusFile setUploadedFile={setUploadedFileF3docx} />
+                                    <HapusFile setUploadedFile={setUploadedFileF3docx} UploadedFile={uploadedFileF3docx}  DataFileUtama={DataFileUtama} setDataFileUtama={setDataFileUtama} fetchDataLOG={fetchDataLOG} fetchDataUtama={fetchDataUtama} />
                                 </div>
                             </div>
                         )}
@@ -687,13 +2064,24 @@ const Form = ({ uploadedFile, setUploadedFile, uploadedFileF2, setUploadedFileF2
                                 <div onClick={handleFileClickF4gambar} className='flex gap-[12px] cursor-pointer'>
                                     <img src={Pdf} alt="pdf" className='w-[36px] h-[36px]' />
                                     <div className='text-left grid gap-[4px]'>
-                                        <h4 className='text-[12px] font-bold'>{uploadedFileF4gambar.name}</h4>
-                                        <p className='text-[12px] text-[#717179]'>{(uploadedFileF4gambar.size / (1024 * 1024)).toFixed(2)} MB</p>
+                                        <h4 className='text-[12px] font-bold'>
+                                        {uploadedFileF4gambar?.name
+                                                ? (uploadedFileF4gambar.name.length > 20
+                                                    ? `${uploadedFileF4gambar.name.slice(0, 20)}...`
+                                                    : uploadedFileF4gambar.name)
+                                                : (uploadedFileF4gambar[0]?.other_file
+                                                    ? (uploadedFileF4gambar[0]?.other_file.length > 20
+                                                        ? `${uploadedFileF4gambar[0]?.other_file.slice(0, 20)}...`
+                                                        : uploadedFileF4gambar[0]?.other_file)
+                                                    : "Nama file tidak tersedia")
+                                            }
+                                        </h4>
+                                        <p className='text-[12px] text-[#717179]'>{uploadedFileF4gambar.size ? (uploadedFileF4gambar.size / (1024 * 1024)).toFixed(2) : serverFileSizef4gambar} MB</p>
                                     </div>
                                 </div>
                                 <div className='flex gap-[12px]'>
                                     <EditFile handleUploadClick={handleUploadClickF4gambar} />
-                                    <HapusFile setUploadedFile={setUploadedFileF4gambar} />
+                                    <HapusFile setUploadedFile={setUploadedFileF4gambar} UploadedFile={uploadedFileF4gambar}  DataFileUtama={DataFileUtama} setDataFileUtama={setDataFileUtama} fetchDataLOG={fetchDataLOG} fetchDataUtama={fetchDataUtama} />
                                 </div>
                             </div>
                         )}
@@ -726,13 +2114,24 @@ const Form = ({ uploadedFile, setUploadedFile, uploadedFileF2, setUploadedFileF2
                                 <div onClick={handleFileClickF4analisa} className='flex gap-[12px] cursor-pointer'>
                                     <img src={Pdf} alt="pdf" className='w-[36px] h-[36px]' />
                                     <div className='text-left grid gap-[4px]'>
-                                        <h4 className='text-[12px] font-bold'>{uploadedFileF4analisa.name.length > 20 ? `${uploadedFileF4analisa.name.slice(0, 20)}...` : uploadedFileF4analisa.name}</h4>
-                                        <p className='text-[12px] text-[#717179]'>{(uploadedFileF4analisa.size / (1024 * 1024)).toFixed(2)} MB</p>
+                                        <h4 className='text-[12px] font-bold'>
+                                        {uploadedFileF4analisa?.name
+                                                ? (uploadedFileF4analisa.name.length > 20
+                                                    ? `${uploadedFileF4analisa.name.slice(0, 20)}...`
+                                                    : uploadedFileF4analisa.name)
+                                                : (uploadedFileF4analisa[0]?.other_file
+                                                    ? (uploadedFileF4analisa[0]?.other_file.length > 20
+                                                        ? `${uploadedFileF4analisa[0]?.other_file.slice(0, 20)}...`
+                                                        : uploadedFileF4analisa[0]?.other_file)
+                                                    : "Nama file tidak tersedia")
+                                            }
+                                        </h4>
+                                        <p className='text-[12px] text-[#717179]'>{uploadedFileF4analisa.size ? (uploadedFileF4analisa.size / (1024 * 1024)).toFixed(2) : serverFileSizef4analisa} MB</p>
                                     </div>
                                 </div>
                                 <div className='flex gap-[12px]'>
                                     <EditFile handleUploadClick={handleUploadClickF4analisa} />
-                                    <HapusFile setUploadedFile={setUploadedFileF4analisa} />
+                                    <HapusFile setUploadedFile={setUploadedFileF4analisa} UploadedFile={uploadedFileF4analisa}  DataFileUtama={DataFileUtama} setDataFileUtama={setDataFileUtama} fetchDataLOG={fetchDataLOG} fetchDataUtama={fetchDataUtama} />
                                 </div>
                             </div>
                         )}
@@ -765,13 +2164,24 @@ const Form = ({ uploadedFile, setUploadedFile, uploadedFileF2, setUploadedFileF2
                                 <div onClick={handleFileClickF4spek} className='flex gap-[12px] cursor-pointer'>
                                     <img src={Pdf} alt="pdf" className='w-[36px] h-[36px]' />
                                     <div className='text-left grid gap-[4px]'>
-                                        <h4 className='text-[12px] font-bold'>{uploadedFileF4spek.name.length > 20 ? `${uploadedFileF4spek.name.slice(0, 20)}...` : uploadedFileF4spek.name}</h4>
-                                        <p className='text-[12px] text-[#717179]'>{(uploadedFileF4spek.size / (1024 * 1024)).toFixed(2)} MB</p>
+                                        <h4 className='text-[12px] font-bold'>
+                                        {uploadedFileF4spek?.name
+                                                ? (uploadedFileF4spek.name.length > 20
+                                                    ? `${uploadedFileF4spek.name.slice(0, 20)}...`
+                                                    : uploadedFileF4spek.name)
+                                                : (uploadedFileF4spek[0]?.other_file
+                                                    ? (uploadedFileF4spek[0]?.other_file.length > 20
+                                                        ? `${uploadedFileF4spek[0]?.other_file.slice(0, 20)}...`
+                                                        : uploadedFileF4spek[0]?.other_file)
+                                                    : "Nama file tidak tersedia")
+                                            }
+                                        </h4>
+                                        <p className='text-[12px] text-[#717179]'>{uploadedFileF4spek.size ? (uploadedFileF4spek.size / (1024 * 1024)).toFixed(2) : serverFileSizef4spek} MB</p>
                                     </div>
                                 </div>
                                 <div className='flex gap-[12px]'>
                                     <EditFile handleUploadClick={handleUploadClickF4spek} />
-                                    <HapusFile setUploadedFile={setUploadedFileF4spek} />
+                                    <HapusFile setUploadedFile={setUploadedFileF4spek} UploadedFile={uploadedFileF4spek}  DataFileUtama={DataFileUtama} setDataFileUtama={setDataFileUtama} fetchDataLOG={fetchDataLOG} fetchDataUtama={fetchDataUtama} />
                                 </div>
                             </div>
                         )}
@@ -804,13 +2214,24 @@ const Form = ({ uploadedFile, setUploadedFile, uploadedFileF2, setUploadedFileF2
                                 <div onClick={handleFileClickF4airhujan} className='flex gap-[12px] cursor-pointer'>
                                     <img src={Pdf} alt="pdf" className='w-[36px] h-[36px]' />
                                     <div className='text-left grid gap-[4px]'>
-                                        <h4 className='text-[12px] font-bold'>{uploadedFileF4airhujan.name.length > 20 ? `${uploadedFileF4airhujan.name.slice(0, 20)}...` : uploadedFileF4airhujan.name}</h4>
-                                        <p className='text-[12px] text-[#717179]'>{(uploadedFileF4airhujan.size / (1024 * 1024)).toFixed(2)} MB</p>
+                                        <h4 className='text-[12px] font-bold'>
+                                        {uploadedFileF4airhujan?.name
+                                                ? (uploadedFileF4airhujan.name.length > 20
+                                                    ? `${uploadedFileF4airhujan.name.slice(0, 20)}...`
+                                                    : uploadedFileF4airhujan.name)
+                                                : (uploadedFileF4airhujan[0]?.other_file
+                                                    ? (uploadedFileF4airhujan[0]?.other_file.length > 20
+                                                        ? `${uploadedFileF4airhujan[0]?.other_file.slice(0, 20)}...`
+                                                        : uploadedFileF4airhujan[0]?.other_file)
+                                                    : "Nama file tidak tersedia")
+                                            }
+                                        </h4>
+                                        <p className='text-[12px] text-[#717179]'>{uploadedFileF4airhujan.size ? (uploadedFileF4airhujan.size / (1024 * 1024)).toFixed(2) : serverFileSizef4airhujan} MB</p>
                                     </div>
                                 </div>
                                 <div className='flex gap-[12px]'>
                                     <EditFile handleUploadClick={handleUploadClickF4airhujan} />
-                                    <HapusFile setUploadedFile={setUploadedFileF4airhujan} />
+                                    <HapusFile setUploadedFile={setUploadedFileF4airhujan} UploadedFile={uploadedFileF4airhujan}  DataFileUtama={DataFileUtama} setDataFileUtama={setDataFileUtama} fetchDataLOG={fetchDataLOG} fetchDataUtama={fetchDataUtama} />
                                 </div>
                             </div>
                         )}
@@ -843,13 +2264,24 @@ const Form = ({ uploadedFile, setUploadedFile, uploadedFileF2, setUploadedFileF2
                                 <div onClick={handleFileClickF4airbersih} className='flex gap-[12px] cursor-pointer'>
                                     <img src={Pdf} alt="pdf" className='w-[36px] h-[36px]' />
                                     <div className='text-left grid gap-[4px]'>
-                                        <h4 className='text-[12px] font-bold'>{uploadedFileF4airbersih.name.length > 20 ? `${uploadedFileF4airbersih.name.slice(0, 20)}...` : uploadedFileF4airbersih.name}</h4>
-                                        <p className='text-[12px] text-[#717179]'>{(uploadedFileF4airbersih.size / (1024 * 1024)).toFixed(2)} MB</p>
+                                        <h4 className='text-[12px] font-bold'>
+                                        {uploadedFileF4airbersih?.name
+                                                ? (uploadedFileF4airbersih.name.length > 20
+                                                    ? `${uploadedFileF4airbersih.name.slice(0, 20)}...`
+                                                    : uploadedFileF4airbersih.name)
+                                                : (uploadedFileF4airbersih[0]?.other_file
+                                                    ? (uploadedFileF4airbersih[0]?.other_file.length > 20
+                                                        ? `${uploadedFileF4airbersih[0]?.other_file.slice(0, 20)}...`
+                                                        : uploadedFileF4airbersih[0]?.other_file)
+                                                    : "Nama file tidak tersedia")
+                                            }
+                                        </h4>
+                                        <p className='text-[12px] text-[#717179]'>{uploadedFileF4airbersih.size ? (uploadedFileF4airbersih.size / (1024 * 1024)).toFixed(2) : serverFileSizef4airbersih} MB</p>
                                     </div>
                                 </div>
                                 <div className='flex gap-[12px]'>
                                     <EditFile handleUploadClick={handleUploadClickF4airbersih} />
-                                    <HapusFile setUploadedFile={setUploadedFileF4airbersih} />
+                                    <HapusFile setUploadedFile={setUploadedFileF4airbersih} UploadedFile={uploadedFileF4airbersih}  DataFileUtama={DataFileUtama} setDataFileUtama={setDataFileUtama} fetchDataLOG={fetchDataLOG} fetchDataUtama={fetchDataUtama} />
                                 </div>
                             </div>
                         )}
@@ -882,13 +2314,24 @@ const Form = ({ uploadedFile, setUploadedFile, uploadedFileF2, setUploadedFileF2
                                 <div onClick={handleFileClickF4airkotor} className='flex gap-[12px] cursor-pointer'>
                                     <img src={Pdf} alt="pdf" className='w-[36px] h-[36px]' />
                                     <div className='text-left grid gap-[4px]'>
-                                        <h4 className='text-[12px] font-bold'>{uploadedFileF4airkotor.name.length > 20 ? `${uploadedFileF4airkotor.name.slice(0, 20)}...` : uploadedFileF4airkotor.name}</h4>
-                                        <p className='text-[12px] text-[#717179]'>{(uploadedFileF4airkotor.size / (1024 * 1024)).toFixed(2)} MB</p>
+                                        <h4 className='text-[12px] font-bold'>
+                                        {uploadedFileF4airkotor?.name
+                                                ? (uploadedFileF4airkotor.name.length > 20
+                                                    ? `${uploadedFileF4airkotor.name.slice(0, 20)}...`
+                                                    : uploadedFileF4airkotor.name)
+                                                : (uploadedFileF4airkotor[0]?.other_file
+                                                    ? (uploadedFileF4airkotor[0]?.other_file.length > 20
+                                                        ? `${uploadedFileF4airkotor[0]?.other_file.slice(0, 20)}...`
+                                                        : uploadedFileF4airkotor[0]?.other_file)
+                                                    : "Nama file tidak tersedia")
+                                            }
+                                        </h4>
+                                        <p className='text-[12px] text-[#717179]'>{uploadedFileF4airkotor.size ? (uploadedFileF4airkotor.size / (1024 * 1024)).toFixed(2) : serverFileSizef4airkotor} MB</p>
                                     </div>
                                 </div>
                                 <div className='flex gap-[12px]'>
                                     <EditFile handleUploadClick={handleUploadClickF4airkotor} />
-                                    <HapusFile setUploadedFile={setUploadedFileF4airkotor} />
+                                    <HapusFile setUploadedFile={setUploadedFileF4airkotor} UploadedFile={uploadedFileF4airkotor}  DataFileUtama={DataFileUtama} setDataFileUtama={setDataFileUtama} fetchDataLOG={fetchDataLOG} fetchDataUtama={fetchDataUtama} />
                                 </div>
                             </div>
                         )}
@@ -921,13 +2364,24 @@ const Form = ({ uploadedFile, setUploadedFile, uploadedFileF2, setUploadedFileF2
                                 <div onClick={handleFileClickF4SLF} className='flex gap-[12px] cursor-pointer'>
                                     <img src={Pdf} alt="pdf" className='w-[36px] h-[36px]' />
                                     <div className='text-left grid gap-[4px]'>
-                                        <h4 className='text-[12px] font-bold'>{uploadedFileF4SLF.name.length > 20 ? `${uploadedFileF4SLF.name.slice(0, 20)}...` : uploadedFileF4SLF.name}</h4>
-                                        <p className='text-[12px] text-[#717179]'>{(uploadedFileF4SLF.size / (1024 * 1024)).toFixed(2)} MB</p>
+                                        <h4 className='text-[12px] font-bold'>
+                                        {uploadedFileF4SLF?.name
+                                                ? (uploadedFileF4SLF.name.length > 20
+                                                    ? `${uploadedFileF4SLF.name.slice(0, 20)}...`
+                                                    : uploadedFileF4SLF.name)
+                                                : (uploadedFileF4SLF[0]?.other_file
+                                                    ? (uploadedFileF4SLF[0]?.other_file.length > 20
+                                                        ? `${uploadedFileF4SLF[0]?.other_file.slice(0, 20)}...`
+                                                        : uploadedFileF4SLF[0]?.other_file)
+                                                    : "Nama file tidak tersedia")
+                                            }
+                                        </h4>
+                                        <p className='text-[12px] text-[#717179]'>{uploadedFileF4SLF.size ? (uploadedFileF4SLF.size / (1024 * 1024)).toFixed(2) : serverFileSizef4slf} MB</p>
                                     </div>
                                 </div>
                                 <div className='flex gap-[12px]'>
                                     <EditFile handleUploadClick={handleUploadClickF4SLF} />
-                                    <HapusFile setUploadedFile={setUploadedFileF4SLF} />
+                                    <HapusFile setUploadedFile={setUploadedFileF4SLF} UploadedFile={uploadedFileF4SLF}  DataFileUtama={DataFileUtama} setDataFileUtama={setDataFileUtama} fetchDataLOG={fetchDataLOG} fetchDataUtama={fetchDataUtama} />
                                 </div>
                             </div>
                         )}
